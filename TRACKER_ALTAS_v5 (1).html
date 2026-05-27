@@ -1,0 +1,2025 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Clínica San Felipe · Tracker Altas Rápidas</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:#F5F3EE;--surface:#FFF;--surface2:#F0EDE6;--border:#E2DDD5;--border2:#D4CFC6;
+    --text:#1A1814;--text2:#6B6760;--text3:#A8A49E;
+    --green:#1A6B4A;--green-bg:#E6F4ED;--green-border:#A8D5BC;
+    --amber:#8A5A00;--amber-bg:#FFF3D6;--amber-border:#F0CC7A;
+    --red:#8B1A1A;--red-bg:#FDEAEA;--red-border:#F0AAAA;
+    --blue:#1A3F6B;--blue-bg:#E6EEF8;--blue-border:#A8C0E0;
+    --purple:#3D1A6B;--purple-bg:#EEE6F8;--purple-border:#C0A8E0;
+    --radius:10px;--radius-sm:6px;
+    --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+    --shadow-md:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;}
+  .app{max-width:860px;margin:0 auto;padding:24px 20px 60px;}
+  .screen{display:none;animation:fadeIn .2s ease;}
+  .screen.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+  /* BUTTONS */
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;border:none;white-space:nowrap;}
+  .btn-primary{background:var(--text);color:#fff;}
+  .btn-primary:hover{background:#333;}
+  .btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border2);box-shadow:var(--shadow);}
+  .btn-secondary:hover{background:var(--surface2);}
+  .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border);}
+  .btn-ghost:hover{background:var(--surface2);}
+  .btn-danger{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);}
+  .btn-danger:hover{background:#f9d5d5;}
+  .btn-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+  .btn-green:hover{background:#d4eddf;}
+  .btn-sm{padding:6px 12px;font-size:12px;}
+
+  /* CARDS */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);margin-bottom:12px;}
+  .card-clickable{cursor:pointer;transition:box-shadow .15s,transform .1s;}
+  .card-clickable:hover{box-shadow:var(--shadow-md);transform:translateY(-1px);}
+
+  /* METRICS */
+  .metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+  .metric-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);}
+  .metric-label{font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+  .metric-value{font-size:28px;font-weight:600;}
+
+  /* FORM */
+  .form-group{margin-bottom:16px;}
+  .form-label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;}
+  .form-input{width:100%;padding:10px 12px;border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--surface);transition:border-color .15s;}
+  .form-input:focus{outline:none;border-color:var(--text);}
+  .form-input.error{border-color:var(--red);background:var(--red-bg);}
+  .form-input:disabled{background:var(--surface2);color:var(--text3);cursor:not-allowed;}
+  .form-hint{font-size:11px;color:var(--text3);margin-top:4px;font-family:'DM Mono',monospace;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+  /* TIPO */
+  .tipo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .tipo-card{padding:14px;border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .15s;background:var(--surface);text-align:left;}
+  .tipo-card:hover{border-color:var(--border2);background:var(--surface2);}
+  .tipo-card.sel-H{border-color:var(--blue-border);background:var(--blue-bg);}
+  .tipo-card.sel-Q{border-color:var(--purple-border);background:var(--purple-bg);}
+  .tipo-card-label{font-size:13px;font-weight:600;margin-bottom:2px;}
+  .tipo-card-code{font-family:'DM Mono',monospace;font-size:12px;}
+
+  /* DOTS & TAGS */
+  .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+  .dot-green{background:var(--green);}
+  .dot-amber{background:#D4900A;}
+  .dot-red{background:#C42B2B;box-shadow:0 0 0 3px #fde8e8;}
+  .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;}
+  .tag-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+  .tag-amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border);}
+  .tag-red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);}
+  .tag-blue{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border);}
+  .tag-purple{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border);}
+  .tag-gray{background:var(--surface2);color:var(--text2);border:1px solid var(--border2);}
+
+  /* PACIENTE CARD */
+  .paciente-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+  .paciente-nombre{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px;}
+  .paciente-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .paciente-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
+  .tiempo-txt{font-size:13px;font-weight:600;}
+
+  /* PBAR */
+  .pbar{height:5px;border-radius:3px;background:var(--surface2);overflow:hidden;margin-top:8px;}
+  .pbar-fill{height:100%;border-radius:3px;transition:width .4s ease;}
+
+  /* SLA BOX */
+  .sla-box{text-align:center;padding:24px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:12px;}
+  .sla-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:8px;}
+  .sla-clock{font-family:'DM Mono',monospace;font-size:42px;font-weight:500;letter-spacing:2px;margin-bottom:6px;}
+  .sla-status{font-size:12px;color:var(--text2);}
+
+  /* PASOS */
+  .paso{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;border-radius:4px;margin:0 -4px;padding-left:4px;padding-right:4px;}
+  .paso:last-child{border-bottom:none;}
+  .paso:hover{background:var(--surface2);}
+  .paso-check{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .2s;}
+  .paso-check.done{background:var(--green);border-color:var(--green);}
+  .paso-titulo{font-size:14px;font-weight:500;transition:color .15s;}
+  .paso-titulo.done{text-decoration:line-through;color:var(--text3);}
+  .paso-sub{font-size:12px;color:var(--text3);margin-top:2px;}
+
+  /* INFO GRID */
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .info-item .info-key{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;color:var(--text3);margin-bottom:3px;}
+  .info-item .info-val{font-size:14px;color:var(--text);}
+
+  /* NPS */
+  .nps-grid{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
+  .nps-btn{width:42px;height:42px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface);font-family:'DM Mono',monospace;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;color:var(--text2);}
+  .nps-btn:hover{border-color:var(--text2);background:var(--surface2);}
+  .nps-det{border-color:#F0AAAA;color:var(--red);}
+  .nps-neu{border-color:var(--amber-border);color:var(--amber);}
+  .nps-pro{border-color:var(--green-border);color:var(--green);}
+  .nps-btn.sel.nps-det{background:var(--red-bg);border-width:2px;}
+  .nps-btn.sel.nps-neu{background:var(--amber-bg);border-width:2px;}
+  .nps-btn.sel.nps-pro{background:var(--green-bg);border-width:2px;}
+  .nps-range-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:14px;}
+
+  /* ALERT */
+  .alert{border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;margin-bottom:14px;border:1px solid;}
+  .alert-amber{background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber);}
+  .alert-green{background:var(--green-bg);border-color:var(--green-border);color:var(--green);}
+  .alert-red{background:var(--red-bg);border-color:var(--red-border);color:var(--red);}
+
+  /* BACK NAV */
+  .back-nav{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+  .back-nav h2{font-size:18px;font-weight:600;}
+
+  /* EMPTY */
+  .empty{text-align:center;padding:50px 20px;color:var(--text3);border:2px dashed var(--border2);border-radius:var(--radius);}
+  .empty-icon{font-size:32px;margin-bottom:10px;}
+  .empty-title{font-size:15px;font-weight:500;color:var(--text2);margin-bottom:6px;}
+  .empty-sub{font-size:13px;}
+
+  /* WA */
+  .nps-wa-box{background:#f0fdf4;border:1.5px solid #25D366;border-radius:var(--radius);padding:16px 18px;margin:16px 0 0;text-align:left;}
+  .nps-wa-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#166534;margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+  .nps-wa-msg{font-size:13px;line-height:1.65;color:var(--text);background:#fff;border:1px solid #bbf7d0;border-radius:8px;padding:11px 13px;white-space:pre-wrap;margin-bottom:10px;}
+  .nps-wa-btn{display:inline-flex;align-items:center;gap:7px;background:#25D366;color:#fff;border:none;padding:10px 20px;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;width:100%;justify-content:center;}
+  .nps-wa-btn:hover{background:#1ebe5d;}
+  .nps-registro-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-top:12px;text-align:left;}
+  .nps-registro-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:12px;}
+  .nps-mini-grid{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
+  .nps-mini-btn{width:38px;height:38px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface);font-family:'DM Mono',monospace;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;color:var(--text2);}
+  .nps-mini-btn:hover{border-color:var(--text2);background:var(--surface2);}
+  .nps-mini-btn.det{border-color:#F0AAAA;color:var(--red);}
+  .nps-mini-btn.neu{border-color:var(--amber-border);color:var(--amber);}
+  .nps-mini-btn.pro{border-color:var(--green-border);color:var(--green);}
+  .nps-mini-btn.sel.det{background:var(--red-bg);border-width:2px;}
+  .nps-mini-btn.sel.neu{background:var(--amber-bg);border-width:2px;}
+  .nps-mini-btn.sel.pro{background:var(--green-bg);border-width:2px;}
+
+  .success-screen{text-align:center;padding:40px 20px 20px;}
+  .success-icon{width:64px;height:64px;border-radius:50%;background:var(--green-bg);border:2px solid var(--green-border);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+
+  .score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+  .score-item{text-align:center;padding:12px 8px;background:var(--surface2);border-radius:var(--radius-sm);}
+  .score-num{font-size:24px;font-weight:600;}
+  .score-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}
+
+  .mono{font-family:'DM Mono',monospace;}
+  .section-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px;}
+  .divider{height:1px;background:var(--border);margin:16px 0;}
+
+  .wa-box{border-radius:var(--radius);border:1.5px solid #25D366;background:#f0fdf4;padding:14px 16px;margin-bottom:12px;}
+  .wa-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+  .wa-icon{flex-shrink:0;}
+  .wa-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#166534;}
+  .wa-badge{margin-left:auto;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em;}
+  .wa-msg{font-size:13px;color:#1a1814;background:#fff;border:1px solid #bbf7d0;border-radius:8px;padding:11px 13px;line-height:1.6;white-space:pre-wrap;font-family:inherit;margin-bottom:10px;}
+  .wa-btn{display:inline-flex;align-items:center;gap:7px;background:#25D366;color:#fff;border:none;padding:10px 20px;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;width:100%;justify-content:center;}
+  .wa-btn:hover{background:#1ebe5d;}
+
+  @media(max-width:480px){.form-grid{grid-template-columns:1fr;}.metrics-grid{grid-template-columns:repeat(3,1fr);gap:6px;}.metric-value{font-size:22px;}.sla-clock{font-size:32px;}}
+
+  /* ═══════════════════════════════════════
+     MODO JEFATURA
+  ═══════════════════════════════════════ */
+
+  /* PIN OVERLAY */
+  .pin-overlay{position:fixed;inset:0;background:rgba(10,18,30,.92);backdrop-filter:blur(6px);z-index:1000;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s ease;}
+  .pin-box{background:#0F1E35;border:1px solid #2A4066;border-radius:16px;padding:36px 32px;width:100%;max-width:360px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.5);}
+  .pin-logo{margin:0 auto 20px;width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#1e3a5f,#2563eb);display:flex;align-items:center;justify-content:center;}
+  .pin-title{font-size:18px;font-weight:600;color:#E8F0FB;margin-bottom:6px;}
+  .pin-sub{font-size:13px;color:#94AACB;margin-bottom:24px;}
+  .pin-dots{display:flex;gap:12px;justify-content:center;margin-bottom:20px;}
+  .pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid #2A4066;transition:all .2s;}
+  .pin-dot.filled{background:#3B82F6;border-color:#3B82F6;box-shadow:0 0 8px rgba(59,130,246,.5);}
+  .pin-dot.error{background:#ef4444;border-color:#ef4444;animation:shake .3s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+  .pin-key{height:54px;border-radius:10px;border:1px solid #2A4066;background:#152540;color:#E8F0FB;font-size:20px;font-weight:500;cursor:pointer;transition:all .15s;font-family:'DM Mono',monospace;}
+  .pin-key:hover{background:#1e3a5f;border-color:#3B82F6;}
+  .pin-key:active{transform:scale(.95);}
+  .pin-key.del{font-size:16px;color:#94AACB;}
+  .pin-error{font-size:12px;color:#f87171;min-height:18px;margin-top:4px;}
+
+  /* JEFATURA SCREEN */
+  #s-jefatura{background:var(--bg);}
+  .jefe-header{background:linear-gradient(135deg,#0F1E35,#1e3a5f);border-radius:var(--radius);padding:20px 22px;margin-bottom:20px;color:#E8F0FB;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+  .jefe-header-left{display:flex;align-items:center;gap:14px;}
+  .jefe-badge{background:rgba(59,130,246,.2);border:1px solid rgba(59,130,246,.4);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:600;color:#93C5FD;text-transform:uppercase;letter-spacing:.06em;}
+  .jefe-title{font-size:20px;font-weight:600;color:#E8F0FB;margin-bottom:2px;}
+  .jefe-sub{font-size:12px;color:#94AACB;}
+
+  /* JEFE MÉTRICAS */
+  .jefe-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+  .jefe-metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);}
+  .jefe-metric-label{font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+  .jefe-metric-val{font-size:26px;font-weight:600;}
+  .jefe-metric-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+
+  /* FILTROS */
+  .jefe-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+  .filter-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;color:var(--text2);}
+  .filter-btn:hover{background:var(--surface2);}
+  .filter-btn.active{background:var(--text);color:#fff;border-color:var(--text);}
+  .filter-select{padding:6px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);font-size:12px;font-weight:500;cursor:pointer;color:var(--text2);font-family:'DM Sans',sans-serif;}
+  .filter-select:focus{outline:none;}
+
+  /* TABLA USUARIO */
+  .user-table{width:100%;border-collapse:collapse;margin-bottom:20px;}
+  .user-table th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);padding:8px 12px;border-bottom:2px solid var(--border);text-align:left;}
+  .user-table td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
+  .user-table tr:hover td{background:var(--surface2);}
+  .user-row-name{font-weight:600;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;}
+  .nps-pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;}
+
+  /* DETALLE CUENTA JEFATURA */
+  .cuenta-timeline{position:relative;padding-left:24px;}
+  .cuenta-timeline::before{content:'';position:absolute;left:7px;top:0;bottom:0;width:2px;background:var(--border);}
+  .timeline-item{position:relative;margin-bottom:16px;}
+  .timeline-dot{position:absolute;left:-24px;top:3px;width:14px;height:14px;border-radius:50%;border:2px solid var(--border);background:var(--surface);}
+  .timeline-dot.done{background:var(--green);border-color:var(--green);}
+  .timeline-dot.pending{background:var(--surface);border-color:var(--border2);}
+  .timeline-title{font-size:13px;font-weight:500;}
+  .timeline-sub{font-size:12px;color:var(--text3);}
+  .timeline-time{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;}
+
+  /* HISTORIAL COMPLETO */
+  .hist-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 80px;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);font-size:12px;align-items:center;}
+  .hist-row:hover{background:var(--surface2);}
+  .hist-head{font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--text3);background:var(--surface2);border-radius:var(--radius-sm) var(--radius-sm) 0 0;border:1px solid var(--border);}
+  .hist-body{border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);}
+  .hist-row:last-child{border-bottom:none;}
+
+  /* TABS */
+  .tabs{display:flex;gap:2px;margin-bottom:20px;border-bottom:2px solid var(--border);padding-bottom:0;}
+  .tab-btn{padding:10px 18px;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;}
+  .tab-btn.active{color:var(--text);border-bottom-color:var(--text);}
+  .tab-btn:hover:not(.active){color:var(--text);background:var(--surface2);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+
+  /* DEMORA CHART */
+  .demora-bar-wrap{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .demora-bar-label{font-size:12px;font-family:'DM Mono',monospace;min-width:90px;color:var(--text2);}
+  .demora-bar-bg{flex:1;height:10px;background:var(--surface2);border-radius:5px;overflow:hidden;}
+  .demora-bar-fill{height:100%;border-radius:5px;transition:width .6s ease;}
+  .demora-bar-val{font-size:12px;font-weight:600;min-width:50px;text-align:right;font-family:'DM Mono',monospace;}
+
+  /* JEFE NAV BTN */
+  .jefe-nav{position:fixed;bottom:20px;right:20px;z-index:500;}
+  .jefe-nav-btn{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:30px;background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(37,99,235,.4);transition:all .2s;}
+  .jefe-nav-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(37,99,235,.5);}
+
+  /* ═══════════════════════════════════════
+     LOGIN DE GESTOR
+  ═══════════════════════════════════════ */
+  #s-login{background:var(--bg);}
+  .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .login-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px 32px;width:100%;max-width:400px;box-shadow:var(--shadow-md);text-align:center;}
+  .login-logo{margin:0 auto 20px;width:60px;height:60px;border-radius:14px;background:#003A70;display:flex;align-items:center;justify-content:center;}
+  .login-title{font-size:20px;font-weight:700;color:#003A70;margin-bottom:4px;}
+  .login-sub{font-size:13px;color:var(--text3);margin-bottom:28px;}
+  .login-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+  .login-user-btn{padding:14px 10px;border:1.5px solid var(--border2);border-radius:var(--radius);background:var(--surface);cursor:pointer;transition:all .15s;text-align:center;font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:var(--text2);}
+  .login-user-btn:hover{border-color:var(--blue-border);background:var(--blue-bg);color:var(--blue);}
+  .login-user-btn.sel{border-color:var(--blue-border);background:var(--blue-bg);color:var(--blue);border-width:2px;}
+  .login-user-avatar{width:32px;height:32px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:13px;font-weight:700;color:var(--text2);}
+  .login-user-btn.sel .login-user-avatar{background:var(--blue-bg);border-color:var(--blue-border);color:var(--blue);}
+  .login-btn-confirm{width:100%;padding:13px;border-radius:var(--radius-sm);background:var(--text);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;opacity:.45;pointer-events:none;}
+  .login-btn-confirm.enabled{opacity:1;pointer-events:all;}
+  .login-btn-confirm.enabled:hover{background:#333;}
+  .login-welcome-bar{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:var(--radius-sm);margin-bottom:16px;}
+  .login-welcome-name{font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:var(--blue);}
+
+  /* FILTROS ESTADO EN LISTA */
+  .lista-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
+  .estado-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;color:var(--text2);}
+  .estado-btn:hover{background:var(--surface2);}
+  .estado-btn.active-all{background:var(--text);color:#fff;border-color:var(--text);}
+  .estado-btn.active-ok{background:var(--green-bg);color:var(--green);border-color:var(--green-border);}
+  .estado-btn.active-riesgo{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-border);}
+  .estado-btn.active-vencida{background:var(--red-bg);color:var(--red);border-color:var(--red-border);}
+
+  /* ═══════════════════════════════════════
+     ENCUESTA NPS DEL PACIENTE (mini-web)
+  ═══════════════════════════════════════ */
+  #s-encuesta-paciente{background:#f7faf9;min-height:100vh;}
+  .enc-wrap{max-width:480px;margin:0 auto;padding:32px 20px 60px;}
+  .enc-header{text-align:center;margin-bottom:32px;}
+  .enc-logo{width:56px;height:56px;border-radius:14px;background:#003A70;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+  .enc-clinica{font-size:13px;font-weight:600;color:#003A70;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;}
+  .enc-titulo{font-size:22px;font-weight:700;color:#1A1814;margin-bottom:6px;line-height:1.25;}
+  .enc-sub{font-size:14px;color:#6B6760;line-height:1.5;}
+  .enc-info-box{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:28px;display:flex;gap:16px;}
+  .enc-info-item{flex:1;}
+  .enc-info-key{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#A8A49E;margin-bottom:3px;}
+  .enc-info-val{font-size:14px;font-weight:600;color:#1A1814;font-family:'DM Mono',monospace;}
+  .enc-pregunta{font-size:16px;font-weight:600;color:#1A1814;margin-bottom:8px;line-height:1.4;}
+  .enc-instruccion{font-size:13px;color:#6B6760;margin-bottom:24px;}
+  .enc-scale{display:grid;grid-template-columns:repeat(11,1fr);gap:6px;margin-bottom:10px;}
+  .enc-num{aspect-ratio:1;border-radius:10px;border:2px solid var(--border2);background:#fff;font-family:'DM Mono',monospace;font-size:16px;font-weight:600;cursor:pointer;transition:all .18s;color:#6B6760;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}
+  .enc-num:hover{transform:scale(1.08);box-shadow:0 4px 12px rgba(0,0,0,.12);}
+  .enc-num:active{transform:scale(.95);}
+  .enc-num.det{border-color:#F0AAAA;color:#8B1A1A;background:#fff5f5;}
+  .enc-num.neu{border-color:#F0CC7A;color:#8A5A00;background:#fffbeb;}
+  .enc-num.pro{border-color:#A8D5BC;color:#1A6B4A;background:#f0faf5;}
+  .enc-num.sel-det{background:#FDEAEA;border-color:#C42B2B;border-width:3px;color:#C42B2B;transform:scale(1.12);box-shadow:0 6px 18px rgba(196,43,43,.2);}
+  .enc-num.sel-neu{background:#FFF3D6;border-color:#D4900A;border-width:3px;color:#D4900A;transform:scale(1.12);box-shadow:0 6px 18px rgba(212,144,10,.2);}
+  .enc-num.sel-pro{background:#E6F4ED;border-color:#1A6B4A;border-width:3px;color:#1A6B4A;transform:scale(1.12);box-shadow:0 6px 18px rgba(26,107,74,.2);}
+  .enc-labels{display:flex;justify-content:space-between;font-size:11px;color:#A8A49E;margin-bottom:28px;}
+  .enc-resultado{text-align:center;padding:40px 24px;background:#fff;border-radius:16px;border:1px solid var(--border);animation:fadeIn .3s ease;}
+  .enc-resultado-icon{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:32px;}
+  .enc-resultado-score{font-size:56px;font-weight:700;font-family:'DM Mono',monospace;margin-bottom:4px;}
+  .enc-resultado-cat{font-size:18px;font-weight:600;margin-bottom:12px;}
+  .enc-resultado-msg{font-size:14px;color:#6B6760;line-height:1.5;}
+  .enc-loading{text-align:center;padding:60px 20px;}
+  .enc-error{text-align:center;padding:60px 20px;color:#8B1A1A;}
+  @media(max-width:380px){.enc-scale{gap:4px;}.enc-num{font-size:14px;border-radius:8px;}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ══════════ PANTALLA 0: LOGIN GESTOR ══════════ -->
+  <div id="s-login" class="screen active">
+    <div class="login-wrap">
+      <div class="login-box">
+        <div class="login-logo">
+          <svg width="32" height="32" viewBox="0 0 44 44" fill="none"><rect width="44" height="44" rx="10" fill="#003A70"/><rect x="18" y="9" width="8" height="26" rx="2" fill="white"/><rect x="9" y="18" width="26" height="8" rx="2" fill="white"/><rect x="18" y="9" width="8" height="4" rx="2" fill="#00A651"/><rect x="9" y="18" width="4" height="8" rx="2" fill="#00A651"/></svg>
+        </div>
+        <div class="login-title">Clínica San Felipe</div>
+        <div class="login-sub">Tracker &middot; Área de Altas &middot; Selecciona tu usuario para continuar</div>
+        <div class="login-grid" id="login-grid"></div>
+        <button class="login-btn-confirm" id="login-confirm-btn" onclick="confirmarLogin()">Ingresar &rarr;</button>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+          <button onclick="abrirPIN()" style="background:none;border:none;font-size:12px;color:var(--text3);cursor:pointer;font-family:'DM Sans',sans-serif">🔒 Acceso de Jefatura</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ PANTALLA 1: LISTA ══════════ -->
+  <div id="s-lista" class="screen">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="flex-shrink:0">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect width="44" height="44" rx="10" fill="#003A70"/><rect x="18" y="9" width="8" height="26" rx="2" fill="white"/><rect x="9" y="18" width="26" height="8" rx="2" fill="white"/><rect x="18" y="9" width="8" height="4" rx="2" fill="#00A651"/><rect x="9" y="18" width="4" height="8" rx="2" fill="#00A651"/></svg>
+        </div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#003A70;letter-spacing:-.01em">Clínica San Felipe</div>
+          <div style="font-size:11px;color:var(--text3);font-weight:500;letter-spacing:.04em;text-transform:uppercase">Tracker · Altas Rápidas</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="irA('s-nuevo')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Registrar alta
+      </button>
+    </div>
+    <div class="app-header">
+      <div>
+        <div class="app-title">Área de Altas Hospitalarias</div>
+        <div style="font-size:20px;font-weight:500" id="fecha-hoy"></div>
+      </div>
+    </div>
+    <!-- Barra usuario activo -->
+    <div class="login-welcome-bar" id="welcome-bar" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="var(--blue)" stroke-width="1.5"/><path d="M2 13c0-2.2 2.7-4 6-4s6 1.8 6 4" stroke="var(--blue)" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <span style="font-size:12px;color:var(--text2)">Sesión activa:</span>
+      <span class="login-welcome-name" id="welcome-name"></span>
+      <button onclick="cerrarSesionGestor()" style="margin-left:auto;background:none;border:none;font-size:11px;color:var(--text3);cursor:pointer;font-family:'DM Sans',sans-serif;padding:2px 6px;border-radius:4px;" title="Cambiar usuario">↩ Cambiar</button>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-card"><div class="metric-label">Activas</div><div class="metric-value" id="cnt-total" style="color:var(--text)">0</div></div>
+      <div class="metric-card"><div class="metric-label">En riesgo</div><div class="metric-value" id="cnt-riesgo" style="color:#D4900A">0</div></div>
+      <div class="metric-card"><div class="metric-label">Vencidas</div><div class="metric-value" id="cnt-vencidas" style="color:#C42B2B">0</div></div>
+    </div>
+    <!-- Filtros de estado -->
+    <div class="lista-filters">
+      <span style="font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.04em">Filtrar:</span>
+      <button class="estado-btn active-all" id="fb-all" onclick="setFiltroEstado('todos',this)">Todas</button>
+      <button class="estado-btn" id="fb-ok" onclick="setFiltroEstado('ok',this)">✓ En tiempo</button>
+      <button class="estado-btn" id="fb-riesgo" onclick="setFiltroEstado('riesgo',this)">⚠ En riesgo</button>
+      <button class="estado-btn" id="fb-vencida" onclick="setFiltroEstado('vencida',this)">✗ Vencidas</button>
+    </div>
+    <div id="lista-container"></div>
+  </div>
+
+  <!-- ══════════ PANTALLA 2: NUEVO ALTA ══════════ -->
+  <div id="s-nuevo" class="screen">
+    <div class="back-nav">
+      <button class="btn btn-ghost btn-sm" onclick="irA('s-lista')">← Volver</button>
+      <h2>Nueva alta rápida</h2>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nombre del paciente</label>
+      <input class="form-input" id="n-nombre" placeholder="Ej. María López Ríos" autocomplete="off"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tipo de atención</label>
+      <div class="tipo-grid">
+        <button class="tipo-card" id="btn-H" onclick="selTipo('H')">
+          <div class="tipo-card-label" style="color:var(--blue)">Hospitalaria</div>
+          <div class="tipo-card-code" style="color:var(--blue)">H0213455</div>
+        </button>
+        <button class="tipo-card" id="btn-Q" onclick="selTipo('Q')">
+          <div class="tipo-card-label" style="color:var(--purple)">Ambulatoria</div>
+          <div class="tipo-card-code" style="color:var(--purple)">Q0015466</div>
+        </button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Número de episodio</label>
+      <input class="form-input mono" id="n-episodio" placeholder="Selecciona el tipo primero" disabled autocomplete="off" oninput="autoFormatEpisodio(this)"/>
+      <div class="form-hint" id="hint-episodio"></div>
+    </div>
+    <div class="form-group" id="row-cama">
+      <label class="form-label">Usuario responsable</label>
+      <select class="form-input" id="n-cama">
+        <option value="">Seleccionar usuario...</option>
+        <option>rcunto</option><option>ccabanillas</option><option>jherrera</option>
+        <option>vquispe</option><option>lcontreras</option><option>fvasquez</option><option>zatoche</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tipo de seguro</label>
+      <select class="form-input" id="n-seguro">
+        <option value="">Seleccionar seguro...</option>
+        <option>Best Doctors Insurance</option>
+        <option>Chubb</option>
+        <option>Cigna</option>
+        <option>Colegio Médico del Perú</option>
+        <option>Fondo de Aseguramiento en Salud</option>
+        <option>Fondo para Enfermedades</option>
+        <option>La Positiva S.A. Entidad Prestadora</option>
+        <option>La Positiva Seguros y Reaseguros</option>
+        <option>La Protectora</option>
+        <option>Mapfre</option>
+        <option>Mapfre EPS</option>
+        <option>Mapfre SEG</option>
+        <option>Ministerio de Economía y Finanzas</option>
+        <option>Organización Panamericana</option>
+        <option>Pacífico EPS</option>
+        <option>Pacífico SEG</option>
+        <option>Particular</option>
+        <option>Quantico Servicios de Asistencia</option>
+        <option>Rímac EPS</option>
+        <option>Rímac SEG</option>
+        <option>Sanitas</option>
+        <option>Shougang Hierro Perú SAA</option>
+        <option>Sistemas de Administración Hospitalaria</option>
+        <option>Surego Administrative Services</option>
+        <option>U.S.A. Medical Services Corporation</option>
+        <option>Unite Healthcare Global</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Motivo de retraso <span style="font-weight:400;color:var(--text3)">(opcional)</span></label>
+      <input class="form-input" id="n-obs" placeholder="Ej. Falta GNC, pendiente carta de garantía" autocomplete="off"/>
+      <div class="form-hint">Si hay un problema conocido, regístralo aquí desde el inicio</div>
+    </div>
+    <div class="alert alert-amber">⏱ Al registrar, el <strong>reloj de 48 h hábiles</strong> empieza a correr desde este momento.</div>
+    <button class="btn btn-primary" style="width:100%;padding:12px;justify-content:center;font-size:14px" onclick="registrarAlta()">Registrar y activar reloj SLA</button>
+  </div>
+
+  <!-- ══════════ PANTALLA 3: DETALLE ══════════ -->
+  <div id="s-detalle" class="screen">
+    <div class="back-nav">
+      <button class="btn btn-ghost btn-sm" onclick="irA('s-lista')">← Volver</button>
+      <h2 id="d-titulo"></h2>
+    </div>
+    <div class="sla-box" id="sla-box">
+      <div class="sla-label">Tiempo restante · SLA 48 h hábiles</div>
+      <div class="sla-clock" id="d-reloj">--:--</div>
+      <div class="sla-status" id="d-status"></div>
+      <div class="pbar" style="margin-top:12px;height:8px"><div class="pbar-fill" id="d-pbar" style="width:100%;background:var(--green)"></div></div>
+    </div>
+    <div class="card">
+      <div class="info-grid">
+        <div class="info-item"><div class="info-key">Tipo</div><div class="info-val" id="d-tipo"></div></div>
+        <div class="info-item"><div class="info-key">Episodio</div><div class="info-val mono" id="d-episodio" style="font-size:15px;font-weight:600"></div></div>
+        <div class="info-item"><div class="info-key">Seguro</div><div class="info-val" id="d-seguro"></div></div>
+        <div class="info-item" id="d-cama-row"><div class="info-key">Usuario</div><div class="info-val mono" id="d-cama"></div></div>
+        <div class="info-item"><div class="info-key">Hora de alta</div><div class="info-val" id="d-hora"></div></div>
+        <div class="info-item"><div class="info-key">Fecha</div><div class="info-val" id="d-fecha"></div></div>
+      </div>
+      <div id="d-obs-row" style="display:none">
+        <div class="divider"></div>
+        <div class="info-item"><div class="info-key">Motivo de retraso</div><div class="info-val" id="d-obs" style="color:var(--amber)"></div></div>
+      </div>
+    </div>
+    <div class="wa-box" id="wa-box">
+      <div class="wa-header">
+        <svg class="wa-icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="10" fill="#25D366"/><path d="M14.5 12.9c-.2-.1-1.2-.6-1.4-.7-.2-.1-.3-.1-.5.1-.1.2-.5.7-.6.8-.1.1-.2.1-.4 0-.2-.1-.9-.3-1.7-1-.6-.6-1-1.3-1.1-1.5-.1-.2 0-.3.1-.4l.3-.4c.1-.1.1-.2.2-.4 0-.1 0-.3 0-.4-.1-.2-.5-1.1-.7-1.5-.2-.4-.3-.3-.5-.3h-.4c-.1 0-.4.1-.6.3-.2.2-.8.8-.8 1.9 0 1.1.8 2.2.9 2.3.1.1 1.6 2.5 3.9 3.4.5.2 1 .3 1.3.4.6.2 1.1.1 1.5-.1.5-.2.8-.7.9-1.2.1-.5.1-.9 0-1z" fill="white"/></svg>
+        <span class="wa-title">Mensaje WhatsApp al paciente</span>
+        <span class="wa-badge" id="wa-badge" style="background:#dcfce7;color:#166534">En tiempo</span>
+      </div>
+      <div class="wa-msg" id="wa-msg"></div>
+      <button class="wa-btn" id="wa-btn" onclick="abrirWhatsApp()">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="10" fill="white" fill-opacity=".25"/><path d="M14.5 12.9c-.2-.1-1.2-.6-1.4-.7-.2-.1-.3-.1-.5.1-.1.2-.5.7-.6.8-.1.1-.2.1-.4 0-.2-.1-.9-.3-1.7-1-.6-.6-1-1.3-1.1-1.5-.1-.2 0-.3.1-.4l.3-.4c.1-.1.1-.2.2-.4 0-.1 0-.3 0-.4-.1-.2-.5-1.1-.7-1.5-.2-.4-.3-.3-.5-.3h-.4c-.1 0-.4.1-.6.3-.2.2-.8.8-.8 1.9 0 1.1.8 2.2.9 2.3.1.1 1.6 2.5 3.9 3.4.5.2 1 .3 1.3.4.6.2 1.1.1 1.5-.1.5-.2.8-.7.9-1.2.1-.5.1-.9 0-1z" fill="white"/></svg>
+        Abrir WhatsApp con mensaje listo
+      </button>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="section-title" style="margin-bottom:0">Pasos para cerrar la cuenta</div>
+        <span style="font-size:12px;color:var(--text3)" id="d-paso-cnt">0 / 4</span>
+      </div>
+      <div id="d-pasos"></div>
+      <div class="pbar" style="margin-top:8px"><div class="pbar-fill" id="d-pasos-bar" style="width:0%;background:var(--green)"></div></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+      <button class="btn btn-ghost" id="btn-enviar" onclick="marcarEnviada()" style="display:none;opacity:0.5;cursor:not-allowed" disabled title="Completa todos los pasos para habilitar esta acción">✓ Marcar cuenta enviada</button>
+      <button class="btn btn-danger" onclick="eliminarAlta()">Eliminar registro</button>
+    </div>
+  </div>
+
+  <!-- ══════════ PANTALLA 4: NPS ══════════ -->
+  <div id="s-nps" class="screen">
+    <div class="back-nav">
+      <button class="btn btn-ghost btn-sm" onclick="irA('s-detalle')">← Volver</button>
+      <h2>NPS del paciente</h2>
+    </div>
+    <div id="nps-contenido"></div>
+  </div>
+
+  <!-- ══════════ PANTALLA 5: CUENTA ENVIADA ══════════ -->
+  <div id="s-cerrada" class="screen">
+    <div class="success-screen">
+      <div class="success-icon"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M5 14l7 7L23 7" stroke="#1A6B4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <h2 style="font-size:22px;font-weight:600;margin-bottom:8px">Cuenta enviada</h2>
+      <p style="color:var(--text2);margin-bottom:4px" id="cerrada-msg"></p>
+      <p style="font-size:13px;margin-bottom:16px" id="cerrada-sla"></p>
+    </div>
+    <!-- PASO 1: Enviar WA -->
+    <div class="nps-wa-box" id="cerrada-wa-box">
+      <div class="nps-wa-title">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="10" fill="#25D366"/><path d="M14.5 12.9c-.2-.1-1.2-.6-1.4-.7-.2-.1-.3-.1-.5.1-.1.2-.5.7-.6.8-.1.1-.2.1-.4 0-.2-.1-.9-.3-1.7-1-.6-.6-1-1.3-1.1-1.5-.1-.2 0-.3.1-.4l.3-.4c.1-.1.1-.2.2-.4 0-.1 0-.3 0-.4-.1-.2-.5-1.1-.7-1.5-.2-.4-.3-.3-.5-.3h-.4c-.1 0-.4.1-.6.3-.2.2-.8.8-.8 1.9 0 1.1.8 2.2.9 2.3.1.1 1.6 2.5 3.9 3.4.5.2 1 .3 1.3.4.6.2 1.1.1 1.5-.1.5-.2.8-.7.9-1.2.1-.5.1-.9 0-1z" fill="white"/></svg>
+        Paso 1 — Enviar encuesta NPS al paciente por WhatsApp
+      </div>
+      <!-- Link preview -->
+      <div style="background:#fff;border:1px solid #bbf7d0;border-radius:8px;padding:10px 13px;margin-bottom:8px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:18px">🔗</span>
+        <div style="flex:1;overflow:hidden">
+          <div style="font-size:11px;font-weight:600;color:#166534;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px">Link de encuesta único</div>
+          <div id="cerrada-link-preview" style="font-size:12px;color:#1A6B4A;font-family:'DM Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+        </div>
+        <button onclick="copiarLinkEncuesta()" style="flex-shrink:0;padding:5px 10px;border-radius:6px;background:#E6F4ED;border:1px solid #A8D5BC;color:#1A6B4A;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif" id="btn-copiar-link">Copiar</button>
+      </div>
+      <div class="nps-wa-msg" id="cerrada-wa-msg"></div>
+      <button class="nps-wa-btn" onclick="abrirWaNps()">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="10" fill="white" fill-opacity=".25"/><path d="M14.5 12.9c-.2-.1-1.2-.6-1.4-.7-.2-.1-.3-.1-.5.1-.1.2-.5.7-.6.8-.1.1-.2.1-.4 0-.2-.1-.9-.3-1.7-1-.6-.6-1-1.3-1.1-1.5-.1-.2 0-.3.1-.4l.3-.4c.1-.1.1-.2.2-.4 0-.1 0-.3 0-.4-.1-.2-.5-1.1-.7-1.5-.2-.4-.3-.3-.5-.3h-.4c-.1 0-.4.1-.6.3-.2.2-.8.8-.8 1.9 0 1.1.8 2.2.9 2.3.1.1 1.6 2.5 3.9 3.4.5.2 1 .3 1.3.4.6.2 1.1.1 1.5-.1.5-.2.8-.7.9-1.2.1-.5.1-.9 0-1z" fill="white"/></svg>
+        Enviar por WhatsApp (link incluido)
+      </button>
+    </div>
+    <!-- PASO 2: Registrar respuesta con un toque -->
+    <div class="nps-registro-box" id="cerrada-auto-box">
+      <div class="nps-registro-title">Paso 2 — Cuando el paciente responda, toca su número aquí</div>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Un solo toque registra el NPS al instante.</p>
+      <div id="cerrada-nps-btns" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:14px"><span>Nada probable</span><span>Muy probable</span></div>
+      <div id="cerrada-nps-cat" style="font-size:13px;font-weight:600;min-height:18px;margin-bottom:6px;color:var(--text2)"></div>
+      <div id="cerrada-nps-ok" style="display:none;margin-bottom:12px" class="alert alert-green">✓ Calificación registrada.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">
+        <button class="btn btn-ghost" onclick="irA('s-lista')">Omitir · volver al inicio</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       PANTALLA 6: JEFATURA
+  ══════════════════════════════════════════ -->
+  <div id="s-jefatura" class="screen">
+    <!-- Header modo jefatura -->
+    <div class="jefe-header">
+      <div class="jefe-header-left">
+        <svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect width="44" height="44" rx="10" fill="rgba(59,130,246,.2)"/><rect x="18" y="9" width="8" height="26" rx="2" fill="#93C5FD"/><rect x="9" y="18" width="26" height="8" rx="2" fill="#93C5FD"/><rect x="18" y="9" width="8" height="4" rx="2" fill="#60A5FA"/><rect x="9" y="18" width="4" height="8" rx="2" fill="#60A5FA"/></svg>
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <div class="jefe-title">Control SLA · Altas</div>
+            <div class="jefe-badge">Supervisor</div>
+          </div>
+          <div class="jefe-sub">Clínica San Felipe · Tiempos de gestión en tiempo real</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.1);color:#E8F0FB;border:1px solid rgba(255,255,255,.2)" onclick="irA('s-lista')">← Volver</button>
+        <button class="btn btn-sm btn-danger" onclick="cerrarSesionJefe()">🔒 Cerrar sesión</button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('tab-resumen')">⏱ SLA en tiempo real</button>
+      <button class="tab-btn" onclick="switchTab('tab-usuarios')">👤 Por gestor</button>
+      <button class="tab-btn" onclick="switchTab('tab-historial')">📋 Historial</button>
+      <button class="tab-btn" onclick="switchTab('tab-nps')">⭐ NPS</button>
+    </div>
+
+    <!-- TAB: SLA EN TIEMPO REAL -->
+    <div id="tab-resumen" class="tab-panel active">
+      <!-- Filtro rápido por gestor -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
+        <span style="font-size:12px;color:var(--text3);font-weight:500">Gestor:</span>
+        <button class="filter-btn active" id="jf-todos" onclick="filtrarJefeUsuario('',this)">Todos</button>
+        <div id="jefe-usuario-btns" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+      </div>
+      <div class="jefe-metrics" id="jefe-metricas"></div>
+
+      <!-- Cuentas que necesitan atención AHORA -->
+      <div class="card">
+        <div class="section-title" style="margin-bottom:14px">🔴 Cuentas que necesitan atención ahora</div>
+        <div id="jefe-alertas"></div>
+      </div>
+
+      <!-- Semáforo SLA por gestor -->
+      <div class="card">
+        <div class="section-title" style="margin-bottom:6px">⏱ Tiempo promedio de cierre por gestor</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:14px">Verde ≤ 24h · Ámbar 24–40h · Rojo > 40h</div>
+        <div id="jefe-demora-chart"></div>
+      </div>
+
+      <!-- Motivos de retraso más frecuentes -->
+      <div class="card">
+        <div class="section-title" style="margin-bottom:14px">📋 Motivos de retraso registrados</div>
+        <div id="jefe-motivos"></div>
+      </div>
+    </div>
+
+    <!-- TAB: POR USUARIO -->
+    <div id="tab-usuarios" class="tab-panel">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
+        <span style="font-size:12px;color:var(--text3);font-weight:500">Filtrar:</span>
+        <button class="filter-btn active" onclick="filtrarUsuarios('todos',this)">Todos</button>
+        <button class="filter-btn" onclick="filtrarUsuarios('activas',this)">Solo activas</button>
+        <button class="filter-btn" onclick="filtrarUsuarios('enviadas',this)">Enviadas</button>
+      </div>
+      <div id="jefe-usuarios-lista"></div>
+    </div>
+
+    <!-- TAB: HISTORIAL COMPLETO -->
+    <div id="tab-historial" class="tab-panel">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
+        <span style="font-size:12px;color:var(--text3);font-weight:500">Usuario:</span>
+        <select class="filter-select" id="hist-filtro-usuario" onchange="renderHistorialCompleto()">
+          <option value="">Todos</option>
+        </select>
+        <span style="font-size:12px;color:var(--text3);font-weight:500;margin-left:8px">Estado:</span>
+        <select class="filter-select" id="hist-filtro-estado" onchange="renderHistorialCompleto()">
+          <option value="">Todos</option>
+          <option value="activa">Activa</option>
+          <option value="enviada">Enviada</option>
+          <option value="vencida">Vencida (al cerrar)</option>
+        </select>
+        <span style="font-size:12px;color:var(--text3);font-weight:500;margin-left:8px">Fecha:</span>
+        <input type="date" class="filter-select" id="hist-filtro-desde" onchange="renderHistorialCompleto()" title="Desde" style="padding:5px 10px;font-family:'DM Sans',sans-serif;font-size:12px"/>
+        <span style="font-size:12px;color:var(--text3)">—</span>
+        <input type="date" class="filter-select" id="hist-filtro-hasta" onchange="renderHistorialCompleto()" title="Hasta" style="padding:5px 10px;font-family:'DM Sans',sans-serif;font-size:12px"/>
+        <button onclick="limpiarFiltroFecha()" style="background:none;border:none;font-size:11px;color:var(--text3);cursor:pointer;font-family:'DM Sans',sans-serif;padding:2px 6px;border-radius:4px;border:1px solid var(--border)" title="Limpiar fechas">✕ Fecha</button>
+      </div>
+      <div id="jefe-historial-completo"></div>
+    </div>
+
+    <!-- TAB: NPS -->
+    <div id="tab-nps" class="tab-panel">
+      <div id="jefe-nps-detalle"></div>
+    </div>
+  </div>
+
+  <!-- ══════════ PANTALLA 7: DETALLE CUENTA (JEFATURA) ══════════ -->
+  <div id="s-jefe-cuenta" class="screen">
+    <div class="back-nav">
+      <button class="btn btn-ghost btn-sm" onclick="irA('s-jefatura')">← Volver a Jefatura</button>
+      <h2 id="jc-titulo"></h2>
+    </div>
+    <div id="jc-contenido"></div>
+  </div>
+
+  <!-- ══════════ PANTALLA 8: ENCUESTA NPS PACIENTE (mini-web) ══════════ -->
+  <div id="s-encuesta-paciente" class="screen">
+    <div class="enc-wrap">
+      <div class="enc-header">
+        <div class="enc-logo">
+          <svg width="30" height="30" viewBox="0 0 44 44" fill="none"><rect width="44" height="44" rx="10" fill="#003A70"/><rect x="18" y="9" width="8" height="26" rx="2" fill="white"/><rect x="9" y="18" width="26" height="8" rx="2" fill="white"/><rect x="18" y="9" width="8" height="4" rx="2" fill="#00A651"/><rect x="9" y="18" width="4" height="8" rx="2" fill="#00A651"/></svg>
+        </div>
+        <div class="enc-clinica">Clínica San Felipe</div>
+        <div class="enc-titulo">¿Cómo fue su experiencia?</div>
+        <div class="enc-sub">Su opinión es muy importante para seguir mejorando nuestro servicio.</div>
+      </div>
+      <div class="enc-info-box" id="enc-info-box">
+        <div class="enc-info-item">
+          <div class="enc-info-key">N° de Atención</div>
+          <div class="enc-info-val" id="enc-episodio">—</div>
+        </div>
+        <div class="enc-info-item">
+          <div class="enc-info-key">Paciente</div>
+          <div class="enc-info-val" id="enc-paciente" style="font-family:'DM Sans',sans-serif;font-size:13px">—</div>
+        </div>
+      </div>
+      <div id="enc-form">
+        <div class="enc-pregunta">Del 0 al 10, ¿con qué probabilidad recomendaría Clínica San Felipe a un familiar o amigo?</div>
+        <div class="enc-instruccion">Toca el número que mejor represente su experiencia</div>
+        <div class="enc-scale" id="enc-scale"></div>
+        <div class="enc-labels"><span>😞 Nada probable</span><span>😊 Muy probable</span></div>
+        <div id="enc-cat-preview" style="text-align:center;min-height:22px;font-size:14px;font-weight:600;margin-bottom:20px;transition:all .2s"></div>
+        <button id="enc-submit-btn" onclick="enviarEncuestaPaciente()" style="width:100%;padding:14px;border-radius:10px;background:#1A6B4A;color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;opacity:.4;pointer-events:none" disabled>
+          Enviar mi calificación →
+        </button>
+      </div>
+      <div id="enc-resultado" style="display:none"></div>
+      <div id="enc-error-box" style="display:none;text-align:center;padding:60px 20px;color:#8B1A1A">
+        <div style="font-size:40px;margin-bottom:16px">⚠️</div>
+        <div style="font-size:18px;font-weight:600;margin-bottom:8px">Enlace no válido</div>
+        <div style="font-size:14px;color:#6B6760">Este enlace de encuesta no es válido o ya fue respondido. Comuníquese con el Área de Altas.</div>
+      </div>
+    </div>
+  </div>
+
+
+</div><!-- /app -->
+
+<!-- ══════════ BOTÓN FLOTANTE JEFATURA ══════════ -->
+<div class="jefe-nav">
+  <button class="jefe-nav-btn" id="jefe-fab" onclick="abrirPIN()">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="8" rx="1.5" stroke="white" stroke-width="1.5"/><path d="M5 7V5a3 3 0 016 0v2" stroke="white" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r="1" fill="white"/></svg>
+    Modo Jefatura
+  </button>
+</div>
+
+<!-- ══════════ PIN OVERLAY ══════════ -->
+<div id="pin-overlay" style="display:none">
+  <div class="pin-overlay" onclick="e=>e.stopPropagation()">
+    <div class="pin-box">
+      <div class="pin-logo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="11" rx="2" stroke="white" stroke-width="1.8"/><path d="M8 11V7a4 4 0 018 0v4" stroke="white" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="16" r="1.5" fill="white"/></svg>
+      </div>
+      <div class="pin-title">Acceso de Jefatura</div>
+      <div class="pin-sub">Ingresa el PIN de 4 dígitos para continuar</div>
+      <div class="pin-dots" id="pin-dots">
+        <div class="pin-dot" id="pd0"></div>
+        <div class="pin-dot" id="pd1"></div>
+        <div class="pin-dot" id="pd2"></div>
+        <div class="pin-dot" id="pd3"></div>
+      </div>
+      <div class="pin-pad">
+        <button class="pin-key" onclick="pinKey('1')">1</button>
+        <button class="pin-key" onclick="pinKey('2')">2</button>
+        <button class="pin-key" onclick="pinKey('3')">3</button>
+        <button class="pin-key" onclick="pinKey('4')">4</button>
+        <button class="pin-key" onclick="pinKey('5')">5</button>
+        <button class="pin-key" onclick="pinKey('6')">6</button>
+        <button class="pin-key" onclick="pinKey('7')">7</button>
+        <button class="pin-key" onclick="pinKey('8')">8</button>
+        <button class="pin-key" onclick="pinKey('9')">9</button>
+        <button class="pin-key del" onclick="pinCerrar()">✕</button>
+        <button class="pin-key" onclick="pinKey('0')">0</button>
+        <button class="pin-key del" onclick="pinBorrar()">⌫</button>
+      </div>
+      <div class="pin-error" id="pin-error"></div>
+      <div style="font-size:11px;color:#4B6A9B;margin-top:8px">PIN por defecto: <span style="font-family:'DM Mono',monospace;color:#60A5FA">1234</span> · Cámbialo en el código</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── ESTADO ─────────────────────────────────────────────────────────────────
+let altas   = [];
+let npsData = [];
+let idxActual   = null;
+let relojTimer  = null;
+let tipoSel     = null;
+let npsSel      = null;
+let npsCerradaSel = null;
+let jefeLogueado  = false;
+let pinIngresado  = '';
+let usuarioActivo = localStorage.getItem('ar_usuario') || null;
+let filtroEstado  = 'todos';
+let loginSeleccionado = null;
+let _appListo = false; // evita render antes de cargar datos
+
+const PIN_CORRECTO = '1234'; // ← CAMBIA AQUÍ EL PIN
+
+const PASOS = [
+  { t:'Verificar cobertura en el sistema',          s:'Revisar si la cuenta es particular o cuenta con carta de garantía aprobada.' },
+  { t:'Conciliar insumos, salas y farmacia',        s:'Validar si es tratamiento o revisión de sala, y que Farmacia haya ingresado el 100% de materiales.' },
+  { t:'Auditar honorarios y Auditoría Médica',      s:'Particular: Confirmar montos de honorarios con médicos. Seguro: Revisar GNC con Auditoría Médica.' },
+  { t:'Notificar y enviar cuenta al paciente / seguro', s:'Realizar el envío formal de la cuenta y transferir el expediente según corresponda.' },
+];
+
+const NPS_CAT = v => v>=9 ? ['Promotor activo','var(--green)'] : v>=7 ? ['Satisfecho','var(--amber)'] : ['Detractor','var(--red)'];
+
+const USUARIOS = ['rcunto','ccabanillas','jherrera','vquispe','lcontreras','fvasquez','zatoche'];
+
+// ─── ALMACENAMIENTO COMPARTIDO (multi-dispositivo) ──────────────────────────
+// Usa window.storage (shared=true) para sincronizar entre PC del gestor
+// y celular del paciente. Fallback a localStorage si no está disponible.
+
+const STORAGE_ALTAS = 'csf:altas';
+const STORAGE_NPS   = 'csf:nps';
+
+async function cargarDatos() {
+  try {
+    if (window.storage) {
+      const [ra, rn] = await Promise.all([
+        window.storage.get(STORAGE_ALTAS, true).catch(() => null),
+        window.storage.get(STORAGE_NPS,   true).catch(() => null)
+      ]);
+      altas   = ra ? JSON.parse(ra.value) : [];
+      npsData = rn ? JSON.parse(rn.value) : [];
+    } else {
+      // Fallback localStorage
+      altas   = JSON.parse(localStorage.getItem('ar_altas') || '[]');
+      npsData = JSON.parse(localStorage.getItem('ar_nps')   || '[]');
+    }
+  } catch(e) {
+    altas   = JSON.parse(localStorage.getItem('ar_altas') || '[]');
+    npsData = JSON.parse(localStorage.getItem('ar_nps')   || '[]');
+  }
+  _appListo = true;
+}
+
+async function guardar() {
+  // Siempre guardar en localStorage como backup local
+  localStorage.setItem('ar_altas', JSON.stringify(altas));
+  localStorage.setItem('ar_nps',   JSON.stringify(npsData));
+  // Guardar en almacenamiento compartido
+  try {
+    if (window.storage) {
+      await Promise.all([
+        window.storage.set(STORAGE_ALTAS, JSON.stringify(altas), true),
+        window.storage.set(STORAGE_NPS,   JSON.stringify(npsData), true)
+      ]);
+    }
+  } catch(e) {
+    console.warn('Storage compartido no disponible, usando localStorage:', e);
+  }
+}
+
+function irA(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (relojTimer) { clearInterval(relojTimer); relojTimer = null; }
+  if (id === 's-lista')    renderLista();
+  if (id === 's-nps')      renderNPS();
+  if (id === 's-jefatura') renderJefatura();
+}
+
+// ─── LOGIN GESTOR ─────────────────────────────────────────────────────────────
+async function initLogin() {
+  // Mostrar pantalla de carga mientras se obtienen datos
+  mostrarCargando('Cargando datos...');
+  await cargarDatos();
+  ocultarCargando();
+
+  const grid = document.getElementById('login-grid');
+  let html = '';
+  USUARIOS.forEach(u => {
+    const initials = u.substring(0,2).toUpperCase();
+    html += `<button class="login-user-btn" id="lu-${u}" onclick="selLoginUser('${u}')">
+      <div class="login-user-avatar">${initials}</div>
+      ${u}
+    </button>`;
+  });
+  grid.innerHTML = html;
+  if (usuarioActivo) {
+    mostrarListaComoGestor();
+  } else {
+    irA('s-login');
+  }
+}
+
+function selLoginUser(u) {
+  loginSeleccionado = u;
+  document.querySelectorAll('.login-user-btn').forEach(b => b.classList.remove('sel'));
+  document.getElementById('lu-'+u).classList.add('sel');
+  const btn = document.getElementById('login-confirm-btn');
+  btn.classList.add('enabled');
+  btn.textContent = 'Ingresar como ' + u + ' →';
+}
+
+function confirmarLogin() {
+  if (!loginSeleccionado) return;
+  usuarioActivo = loginSeleccionado;
+  localStorage.setItem('ar_usuario', usuarioActivo);
+  mostrarListaComoGestor();
+}
+
+function mostrarListaComoGestor() {
+  const bar = document.getElementById('welcome-bar');
+  const name = document.getElementById('welcome-name');
+  if (bar && name) { bar.style.display = 'flex'; name.textContent = usuarioActivo; }
+  irA('s-lista');
+}
+
+function cerrarSesionGestor() {
+  usuarioActivo = null;
+  loginSeleccionado = null;
+  localStorage.removeItem('ar_usuario');
+  document.getElementById('login-confirm-btn').classList.remove('enabled');
+  document.getElementById('login-confirm-btn').textContent = 'Ingresar →';
+  document.querySelectorAll('.login-user-btn').forEach(b => b.classList.remove('sel'));
+  irA('s-login');
+}
+
+// ─── FILTRO ESTADO LISTA ──────────────────────────────────────────────────────
+function setFiltroEstado(f, btn) {
+  filtroEstado = f;
+  ['fb-all','fb-ok','fb-riesgo','fb-vencida'].forEach(id => {
+    const b = document.getElementById(id);
+    if (b) b.className = 'estado-btn';
+  });
+  const clsMap = {todos:'active-all', ok:'active-ok', riesgo:'active-riesgo', vencida:'active-vencida'};
+  if (btn) btn.className = 'estado-btn ' + clsMap[f];
+  renderLista();
+}
+
+function horasHabiles(desde) {
+  const LIMITE = 48;
+  let h = 0, cur = new Date(desde), now = new Date();
+  const step = 60000;
+  while (cur < now && h < LIMITE) {
+    const d = cur.getDay(), hr = cur.getHours();
+    if (d >= 1 && d <= 5 && hr >= 8 && hr < 18) h += 1/60;
+    cur = new Date(cur.getTime() + step);
+  }
+  return Math.min(h, LIMITE);
+}
+
+function horasHabilesHasta(desde, hasta) {
+  let h = 0, cur = new Date(desde), end = new Date(hasta);
+  const step = 60000;
+  while (cur < end) {
+    const d = cur.getDay(), hr = cur.getHours();
+    if (d >= 1 && d <= 5 && hr >= 8 && hr < 18) h += 1/60;
+    cur = new Date(cur.getTime() + step);
+  }
+  return h;
+}
+
+function estado(h) {
+  if (h >= 48) return 'vencida';
+  if (h >= 36) return 'critica';
+  if (h >= 24) return 'riesgo';
+  return 'ok';
+}
+
+function formatTime(restante) {
+  const h = Math.floor(restante), m = Math.floor((restante%1)*60);
+  return h+'h '+String(m).padStart(2,'0')+'m';
+}
+
+function fmtFecha(iso) {
+  return new Date(iso).toLocaleDateString('es-PE',{day:'2-digit',month:'short',year:'numeric'});
+}
+function fmtHora(iso) {
+  return new Date(iso).toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'});
+}
+
+document.getElementById('fecha-hoy').textContent =
+  new Date().toLocaleDateString('es-PE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+// ─── TIPO SELECTOR ────────────────────────────────────────────────────────────
+function selTipo(t) {
+  tipoSel = t;
+  document.getElementById('btn-H').className = 'tipo-card'+(t==='H'?' sel-H':'');
+  document.getElementById('btn-Q').className = 'tipo-card'+(t==='Q'?' sel-Q':'');
+  const inp = document.getElementById('n-episodio');
+  inp.disabled = false; inp.value = ''; inp.classList.remove('error');
+  if (t==='H') {
+    inp.placeholder = 'H0213455';
+    document.getElementById('hint-episodio').textContent = 'Formato: H seguida de 7 dígitos';
+    document.getElementById('row-cama').style.display = 'block';
+  } else {
+    inp.placeholder = 'Q0015466';
+    document.getElementById('hint-episodio').textContent = 'Formato: Q seguida de 7 dígitos';
+    document.getElementById('row-cama').style.display = 'none';
+    document.getElementById('n-cama').value = '';
+  }
+  inp.focus();
+}
+
+function autoFormatEpisodio(inp) {
+  inp.value = inp.value.toUpperCase().replace(/[^HQ0-9]/g,'');
+}
+
+function validarEpisodio(v,t) {
+  return t==='H' ? /^H\d{7}$/.test(v) : /^Q\d{7}$/.test(v);
+}
+
+// ─── REGISTRAR ALTA ────────────────────────────────────────────────────────────
+async function registrarAlta() {
+  const nombre   = document.getElementById('n-nombre').value.trim();
+  const episodio = document.getElementById('n-episodio').value.trim().toUpperCase();
+  const cama     = document.getElementById('n-cama').value.trim();
+  const seguro   = document.getElementById('n-seguro').value;
+  const obs      = document.getElementById('n-obs').value.trim();
+  ['n-nombre','n-episodio','n-seguro'].forEach(id => document.getElementById(id).classList.remove('error'));
+  let err = [];
+  if (!nombre) { document.getElementById('n-nombre').classList.add('error'); err.push('Nombre del paciente'); }
+  if (!tipoSel) err.push('Tipo de atención');
+  if (!validarEpisodio(episodio,tipoSel)) { document.getElementById('n-episodio').classList.add('error'); err.push('Número de episodio inválido'); }
+  if (!seguro) { document.getElementById('n-seguro').classList.add('error'); err.push('Tipo de seguro'); }
+  if (err.length) { alert('Por favor corrige:\n• '+err.join('\n• ')); return; }
+  altas.push({ id:Date.now(), nombre, tipo:tipoSel, episodio, cama:tipoSel==='H'?cama:'', seguro, obs, fecha:new Date().toISOString(), pasos:[false,false,false,false], enviada:false });
+  await guardar();
+  ['n-nombre','n-episodio','n-obs'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('n-cama').value=''; document.getElementById('n-seguro').value='';
+  document.getElementById('n-episodio').disabled=true; document.getElementById('n-episodio').placeholder='Selecciona el tipo primero';
+  document.getElementById('hint-episodio').textContent='';
+  document.getElementById('btn-H').className='tipo-card'; document.getElementById('btn-Q').className='tipo-card';
+  document.getElementById('row-cama').style.display='block'; tipoSel=null;
+  irA('s-lista');
+}
+
+// ─── RENDER LISTA ────────────────────────────────────────────────────────────
+function renderLista() {
+  // Actualizar barra de usuario
+  const bar = document.getElementById('welcome-bar');
+  const name = document.getElementById('welcome-name');
+  if (bar && name && usuarioActivo) { bar.style.display = 'flex'; name.textContent = usuarioActivo; }
+
+  // Filtrar por usuario activo (cada gestor ve solo las suyas)
+  let activas = altas.filter(a => !a.enviada);
+  if (usuarioActivo) activas = activas.filter(a => a.cama === usuarioActivo || a.cama === '');
+
+  // Métricas siempre sobre las cuentas del usuario
+  let riesgo=0, vencidas=0;
+  activas.forEach(a => {
+    const h = horasHabiles(a.fecha), est = estado(h);
+    if (est==='riesgo'||est==='critica') riesgo++;
+    if (est==='vencida') vencidas++;
+  });
+  document.getElementById('cnt-total').textContent=activas.length;
+  document.getElementById('cnt-riesgo').textContent=riesgo;
+  document.getElementById('cnt-vencidas').textContent=vencidas;
+
+  const cont = document.getElementById('lista-container');
+
+  // Aplicar filtro de estado
+  let filtradas = activas;
+  if (filtroEstado === 'ok')     filtradas = activas.filter(a => estado(horasHabiles(a.fecha)) === 'ok');
+  if (filtroEstado === 'riesgo') filtradas = activas.filter(a => { const e=estado(horasHabiles(a.fecha)); return e==='riesgo'||e==='critica'; });
+  if (filtroEstado === 'vencida') filtradas = activas.filter(a => estado(horasHabiles(a.fecha)) === 'vencida');
+
+  if (!filtradas.length) {
+    const msgVacio = activas.length === 0
+      ? `<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">No hay altas activas</div><div class="empty-sub">Presiona <strong>+ Registrar alta</strong> para comenzar</div></div>`
+      : `<div class="empty"><div class="empty-icon">✓</div><div class="empty-title">Sin cuentas en este estado</div><div class="empty-sub">Cambia el filtro para ver otras cuentas</div></div>`;
+    cont.innerHTML = msgVacio;
+    return;
+  }
+  const orden={vencida:0,critica:1,riesgo:2,ok:3};
+  const sorted=[...filtradas].sort((a,b)=>orden[estado(horasHabiles(a.fecha))]-orden[estado(horasHabiles(b.fecha))]);
+  let html='';
+  sorted.forEach(a => {
+    const idx=altas.indexOf(a), h=horasHabiles(a.fecha), est=estado(h), restante=Math.max(0,48-h);
+    const hechos=a.pasos.filter(Boolean).length;
+    const dotCls=est==='ok'?'dot-green':est==='vencida'?'dot-red':'dot-amber';
+    const tagCls=est==='ok'?'tag-green':est==='vencida'?'tag-red':'tag-amber';
+    const tagTxt=est==='ok'?'En tiempo':est==='riesgo'?'En riesgo':est==='critica'?'Crítico':'Vencida';
+    const tipoTag=a.tipo==='H'?'<span class="tag tag-blue" style="font-size:10px">Hospitalaria</span>':'<span class="tag tag-purple" style="font-size:10px">Ambulatoria</span>';
+    const color=est==='ok'?'var(--green)':est==='vencida'?'#C42B2B':'#D4900A';
+    const tiempoTxt=est==='vencida'?'¡Vencida!':formatTime(restante)+' restantes';
+    const pct=Math.min(100,(hechos/PASOS.length)*100);
+    if(est==='riesgo'||est==='critica') riesgo++;
+    if(est==='vencida') vencidas++;
+    html+=`<div class="card card-clickable" onclick="verDetalle(${idx})">
+      <div class="paciente-header">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="dot ${dotCls}" style="margin-top:3px"></div>
+          <div>
+            <div class="paciente-nombre">${a.nombre}</div>
+            <div class="paciente-meta">${tipoTag}<span class="mono" style="font-size:12px;color:var(--text2);font-weight:500">${a.episodio}</span>${a.cama?`<span style="font-size:12px;color:var(--text3)">Usuario: ${a.cama}</span>`:''}</div>
+          </div>
+        </div>
+        <span class="tag ${tagCls}">${tagTxt}</span>
+      </div>
+      <div class="paciente-footer">
+        <span style="font-size:12px;color:var(--text3)">${a.seguro} · ${hechos}/${PASOS.length} pasos</span>
+        <span class="tiempo-txt" style="color:${color}">${tiempoTxt}</span>
+      </div>
+      <div class="pbar"><div class="pbar-fill" style="width:${pct}%;background:${color}"></div></div>
+    </div>`;
+  });
+  cont.innerHTML=html;
+}
+
+// ─── VER DETALLE ────────────────────────────────────────────────────────────
+function verDetalle(idx) {
+  idxActual=idx; const a=altas[idx];
+  document.getElementById('d-titulo').textContent=a.nombre;
+  document.getElementById('d-tipo').innerHTML=a.tipo==='H'?'<span class="tag tag-blue">Hospitalaria</span>':'<span class="tag tag-purple">Ambulatoria</span>';
+  document.getElementById('d-episodio').textContent=a.episodio;
+  document.getElementById('d-seguro').textContent=a.seguro;
+  const dt=new Date(a.fecha);
+  document.getElementById('d-hora').textContent=dt.toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('d-fecha').textContent=dt.toLocaleDateString('es-PE',{day:'2-digit',month:'short'});
+  const camaRow=document.getElementById('d-cama-row');
+  if(a.cama){camaRow.style.display='block';document.getElementById('d-cama').textContent=a.cama;}else camaRow.style.display='none';
+  const obsRow=document.getElementById('d-obs-row');
+  if(a.obs){obsRow.style.display='block';document.getElementById('d-obs').textContent=a.obs;}else obsRow.style.display='none';
+  renderPasos(idx); tickReloj(idx);
+  relojTimer=setInterval(()=>tickReloj(idx),30000);
+  irA('s-detalle');
+}
+
+function tickReloj(idx) {
+  const a=altas[idx], h=horasHabiles(a.fecha), est=estado(h), restante=Math.max(0,48-h);
+  const pct=Math.min(100,(h/48)*100);
+  const color=est==='ok'?'var(--green)':est==='vencida'?'#C42B2B':'#D4900A';
+  const textos={ok:'✓ Dentro del SLA',riesgo:'• Alerta · Revisar con supervisor',critica:'🔴 Escalar a jefatura de inmediato',vencida:'✗ SLA incumplido · Gestionar urgente'};
+  document.getElementById('d-reloj').textContent=est==='vencida'?'¡Vencida!':formatTime(restante);
+  document.getElementById('d-reloj').style.color=color;
+  document.getElementById('d-status').textContent=textos[est];
+  document.getElementById('d-pbar').style.width=pct+'%';
+  document.getElementById('d-pbar').style.background=color;
+  actualizarWA(a,est,h,restante);
+}
+
+// ─── PASOS ────────────────────────────────────────────────────────────────────
+function renderPasos(idx) {
+  const a=altas[idx], hechos=a.pasos.filter(Boolean).length;
+  let html='';
+  PASOS.forEach((p,i)=>{
+    const done=a.pasos[i];
+    html+=`<div class="paso" onclick="togglePaso(${idx},${i})">
+      <div class="paso-check ${done?'done':''}">${done?'<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5l2.5 2.5 4.5-5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</div>
+      <div><div class="paso-titulo ${done?'done':''}">${p.t}</div><div class="paso-sub">${p.s}</div></div>
+    </div>`;
+  });
+  document.getElementById('d-pasos').innerHTML=html;
+  document.getElementById('d-paso-cnt').textContent=hechos+' / '+PASOS.length;
+  document.getElementById('d-pasos-bar').style.width=(hechos/PASOS.length*100)+'%';
+  const btnEnviar = document.getElementById('btn-enviar');
+  const todosHechos = hechos === PASOS.length;
+  btnEnviar.style.display='inline-flex';
+  if (todosHechos) {
+    btnEnviar.disabled = false;
+    btnEnviar.className = 'btn btn-green';
+    btnEnviar.style.opacity = '1';
+    btnEnviar.style.cursor = 'pointer';
+    btnEnviar.title = '';
+  } else {
+    btnEnviar.disabled = true;
+    btnEnviar.className = 'btn btn-ghost';
+    btnEnviar.style.opacity = '0.5';
+    btnEnviar.style.cursor = 'not-allowed';
+    btnEnviar.title = 'Completa todos los pasos para habilitar esta acción';
+  }
+}
+
+async function togglePaso(idx,i){altas[idx].pasos[i]=!altas[idx].pasos[i];await guardar();renderPasos(idx);}
+
+// ─── MARCAR ENVIADA ────────────────────────────────────────────────────────────
+async function marcarEnviada() {
+  const a=altas[idxActual], h=horasHabiles(a.fecha);
+  a.enviada=true; a.fechaEnvio=new Date().toISOString(); a.hUsadas=h;
+  await guardar();
+  const cumple=h<=48;
+  document.getElementById('cerrada-msg').textContent=`Cuenta de ${a.nombre} (${a.episodio}) marcada como enviada.`;
+  document.getElementById('cerrada-sla').innerHTML=cumple
+    ?`<span style="color:var(--green);font-weight:600">✓ SLA cumplido en ${Math.floor(h)}h ${Math.floor((h%1)*60)}m</span> de 48h hábiles.`
+    :`<span style="color:#C42B2B;font-weight:600">✗ SLA incumplido: ${Math.floor(h)}h hábiles</span> (límite: 48h).`;
+  document.getElementById('cerrada-wa-msg').textContent = generarMsgNpsWA(a);
+  // Link preview
+  const link = generarLinkEncuesta(a.episodio);
+  const prev = document.getElementById('cerrada-link-preview');
+  if (prev) prev.textContent = link;
+  // Ocultar la sección de registro manual (Paso 2), ya no es necesaria
+  const autoBox = document.getElementById('cerrada-auto-box');
+  if (autoBox) autoBox.style.display = 'none';
+  irA('s-cerrada');
+}
+
+function copiarLinkEncuesta() {
+  const prev = document.getElementById('cerrada-link-preview');
+  if (!prev) return;
+  navigator.clipboard.writeText(prev.textContent).then(() => {
+    const btn = document.getElementById('btn-copiar-link');
+    if (btn) { btn.textContent = '✓ Copiado'; setTimeout(() => btn.textContent = 'Copiar', 2000); }
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = prev.textContent;
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    const btn = document.getElementById('btn-copiar-link');
+    if (btn) { btn.textContent = '✓ Copiado'; setTimeout(() => btn.textContent = 'Copiar', 2000); }
+  });
+}
+
+function generarLinkEncuesta(episodio) {
+  // Genera el link al mismo archivo HTML con ?nps=EPISODIO
+  const base = window.location.href.split('?')[0].split('#')[0];
+  return base + '?nps=' + encodeURIComponent(episodio);
+}
+
+function generarMsgNpsWA(a){
+  const link = generarLinkEncuesta(a.episodio);
+  return `\u{1F44B} Hola ${a.nombre},\n\nGracias por confiar en *Cl\u00EDnica San Felipe*. Su atenci\u00F3n ha sido procesada y enviada al seguro *${a.seguro}*.\n\n\u{1F4CB} *N\u00B0 de Atenci\u00F3n:* ${a.episodio}\n\u{1F3E5} *Seguro:* ${a.seguro}\n\nNos gustar\u00EDa conocer su experiencia con nosotros.\n\n\u{1F31F} *Por favor, toca el siguiente enlace y selecciona tu calificaci\u00F3n:*\n${link}\n\nSolo toma 10 segundos. \u00A1Muchas gracias por su tiempo!\n\n_\u00C1rea de Altas \u00B7 Cl\u00EDnica San Felipe_`;
+}
+
+function abrirWaNps(){const texto=document.getElementById('cerrada-wa-msg').textContent;window.open('https://wa.me/?text='+encodeURIComponent(texto),'_blank');}
+
+function registrarNpsCerrada(v) {
+  const a = altas[idxActual] || {nombre:'Sin asignar', episodio:'', cama:''};
+  // Highlight seleccionado
+  for(let i=0;i<=10;i++){const b=document.getElementById('cnps-'+i);if(b)b.classList.remove('sel');}
+  document.getElementById('cnps-'+v).classList.add('sel');
+  const [cat, color] = NPS_CAT(v);
+  document.getElementById('cerrada-nps-cat').textContent = cat;
+  document.getElementById('cerrada-nps-cat').style.color = color;
+  // Guardar inmediatamente
+  npsData.push({paciente:a.nombre, episodio:a.episodio, usuario:a.cama, score:v, comentario:'', fecha:new Date().toISOString(), viaWA:true});
+  guardar();
+  // Feedback visual
+  document.getElementById('cerrada-nps-ok').style.display = 'block';
+  document.getElementById('cerrada-nps-ok').textContent = `✓ NPS ${v}/10 · ${cat} — registrado correctamente.`;
+  document.querySelectorAll('.nps-mini-btn').forEach(b => b.disabled = true);
+}
+
+async function eliminarAlta(){
+  if(!confirm('¿Eliminar el registro de '+altas[idxActual].nombre+'?'))return;
+  altas.splice(idxActual,1);await guardar();irA('s-lista');
+}
+
+// ─── NPS (solo lectura) ───────────────────────────────────────────────────────
+function renderNPS(){
+  const a = altas[idxActual];
+  const cont = document.getElementById('nps-contenido');
+  if (!a) return;
+  const registros = npsData.filter(n => n.episodio === a.episodio);
+  if (!registros.length) {
+    cont.innerHTML=`<div class="card" style="text-align:center;padding:32px 20px">
+      <div style="font-size:32px;margin-bottom:10px">⭐</div>
+      <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px">Sin calificación aún</div>
+      <div style="font-size:13px;color:var(--text3)">El paciente aún no ha respondido la encuesta NPS.</div>
+    </div>`;
+    return;
+  }
+  const r = registros[registros.length - 1];
+  const [cat, color] = NPS_CAT(r.score);
+  const tagCls = r.score>=9?'tag-green':r.score>=7?'tag-amber':'tag-red';
+  const grande = r.score>=9?'var(--green)':r.score>=7?'#D4900A':'#C42B2B';
+  const bgGrande = r.score>=9?'var(--green-bg)':r.score>=7?'var(--amber-bg)':'var(--red-bg)';
+  cont.innerHTML=`
+    <div class="card" style="text-align:center;padding:28px 20px">
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:12px">Calificación del paciente</div>
+      <div style="display:inline-flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:50%;background:${bgGrande};border:2px solid ${grande};margin-bottom:12px">
+        <span style="font-size:36px;font-weight:700;color:${grande};font-family:'DM Mono',monospace">${r.score}</span>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:4px">de 10 puntos</div>
+      <div style="font-size:16px;font-weight:600;color:${grande};margin-bottom:16px">${cat}</div>
+      <div class="divider"></div>
+      <div class="info-grid" style="margin-top:14px;text-align:left">
+        <div class="info-item"><div class="info-key">Paciente</div><div class="info-val">${r.paciente}</div></div>
+        <div class="info-item"><div class="info-key">Episodio</div><div class="info-val mono" style="font-weight:600">${r.episodio}</div></div>
+        <div class="info-item"><div class="info-key">Registrado</div><div class="info-val">${fmtFecha(r.fecha)} ${fmtHora(r.fecha)}</div></div>
+        <div class="info-item"><div class="info-key">Usuario</div><div class="info-val mono">${r.usuario||'—'}</div></div>
+      </div>
+      ${r.comentario?`<div class="divider"></div><div style="font-size:13px;color:var(--text2);font-style:italic;text-align:left">"${r.comentario}"</div>`:''}
+    </div>`;
+}
+
+function renderHistorialNPS(){
+  const cont=document.getElementById('nps-historial');
+  if(!npsData.length){cont.innerHTML='<p style="font-size:13px;color:var(--text3);padding:8px 0">Aún no hay evaluaciones registradas.</p>';return;}
+  const total=npsData.length, prom=npsData.reduce((s,n)=>s+n.score,0)/total;
+  const promo=npsData.filter(n=>n.score>=9).length, detrac=npsData.filter(n=>n.score<=6).length;
+  const npsScore=Math.round(((promo-detrac)/total)*100);
+  const scoreColor=npsScore>=50?'var(--green)':npsScore>=0?'#D4900A':'#C42B2B';
+  let html=`<div class="score-grid">
+    <div class="score-item"><div class="score-num" style="color:${scoreColor}">${npsScore}</div><div class="score-lbl">NPS Score</div></div>
+    <div class="score-item"><div class="score-num">${Math.round(prom*10)/10}</div><div class="score-lbl">Promedio</div></div>
+    <div class="score-item"><div class="score-num">${total}</div><div class="score-lbl">Registros</div></div>
+  </div>`;
+  npsData.slice(-5).reverse().forEach(n=>{
+    const [cat]=NPS_CAT(n.score),cls=n.score>=9?'tag-green':n.score>=7?'tag-amber':'tag-red';
+    html+=`<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-size:13px;font-weight:500">${n.paciente} <span class="mono" style="font-size:11px;color:var(--text3)">${n.episodio}</span></div>
+        ${n.comentario?`<div style="font-size:12px;color:var(--text2);margin-top:2px">"${n.comentario}"</div>`:''}
+      </div>
+      <span class="tag ${cls}" style="margin-left:10px;flex-shrink:0">${n.score}/10</span>
+    </div>`;
+  });
+  cont.innerHTML=html;
+}
+
+// ─── WHATSAPP ────────────────────────────────────────────────────────────────
+function generarMsgWA(a,est,horasUsadas,restante){
+  const nombre=a.nombre,episodio=a.episodio,seguro=a.seguro;
+  const hU=Math.floor(horasUsadas),mU=Math.floor((horasUsadas%1)*60);
+  const hR=Math.floor(restante),mR=Math.floor((restante%1)*60);
+  const E={
+    saludo:'👋',
+    nota:'📋',
+    hospital:'🏥',
+    ok:'✅',
+    reloj:'⏱',
+    alerta:'⚠️',
+    rojo:'🔴',
+    error:'❌',
+    estrella:'🌟',
+    wa:'💬'
+  };
+  const msgs={
+    ok:`${E.saludo} Hola ${nombre},\n\nLe escribimos del *\u00C1rea de Altas de Cl\u00EDnica San Felipe* para informarle sobre el estado de su cuenta.\n\n${E.nota} *N\u00B0 de Atenci\u00F3n:* ${episodio}\n${E.hospital} *Seguro:* ${seguro}\n${E.ok} *Estado:* En proceso \u2014 dentro del plazo\n\nSu cuenta se encuentra en revisi\u00F3n y avanza dentro de los tiempos establecidos. Le notificaremos en cuanto est\u00E9 lista para el env\u00EDo.\n\n${E.reloj} Tiempo transcurrido: ${hU}h ${mU}m de 48h h\u00E1biles.\n\nAntes cualquier consulta, estamos a su disposici\u00F3n.\n\n_\u00C1rea de Altas \u00B7 Cl\u00EDnica San Felipe_`,
+    riesgo:`${E.saludo} Hola ${nombre},\n\nLe contactamos del *\u00C1rea de Altas de Cl\u00EDnica San Felipe* con una actualizaci\u00F3n sobre su cuenta.\n\n${E.nota} *N\u00B0 de Atenci\u00F3n:* ${episodio}\n${E.hospital} *Seguro:* ${seguro}\n${E.alerta} *Estado:* En gesti\u00F3n \u2014 quedan ${hR}h ${mR}m para el cierre\n\nNuestro equipo est\u00E1 trabajando activamente en su caso para cumplir con los plazos establecidos.\n\nAntes cualquier consulta, estamos a su disposici\u00F3n.\n\n_\u00C1rea de Altas \u00B7 Cl\u00EDnica San Felipe_`,
+    critica:`${E.saludo} Hola ${nombre},\n\nLe contactamos urgentemente del *\u00C1rea de Altas de Cl\u00EDnica San Felipe*.\n\n${E.nota} *N\u00B0 de Atenci\u00F3n:* ${episodio}\n${E.rojo} *Estado:* Situaci\u00F3n cr\u00EDtica \u2014 quedan ${hR}h ${mR}m h\u00E1biles\n\nSu caso ha sido escalado como prioridad m\u00E1xima y estamos gestion\u00E1ndolo de inmediato.\n\nAntes cualquier consulta, estamos a su disposici\u00F3n.\n\n_\u00C1rea de Altas \u00B7 Cl\u00EDnica San Felipe_`,
+    vencida:`${E.saludo} Hola ${nombre},\n\nLe escribimos del *\u00C1rea de Altas de Cl\u00EDnica San Felipe* con informaci\u00F3n importante sobre su cuenta.\n\n${E.nota} *N\u00B0 de Atenci\u00F3n:* ${episodio}\n${E.error} *Estado:* Plazo superado \u2014 ${hU}h ${mU}m h\u00E1biles transcurridas\n\nSu caso es nuestra m\u00E1xima prioridad. Le pedimos disculpas por el inconveniente y le informaremos a la brevedad sobre la resoluci\u00F3n.\n\nAntes cualquier consulta, estamos a su disposici\u00F3n.\n\n_\u00C1rea de Altas \u00B7 Cl\u00EDnica San Felipe_`
+  };
+  return msgs[est]||msgs.ok;
+}
+
+function actualizarWA(a,est,hU,restante){
+  const cfgs={ok:{badge:'En tiempo',bg:'#dcfce7',color:'#166534'},riesgo:{badge:'En riesgo',bg:'#fef9c3',color:'#854d0e'},critica:{badge:'Crítico',bg:'#fee2e2',color:'#991b1b'},vencida:{badge:'SLA vencido',bg:'#fee2e2',color:'#991b1b'}};
+  const cfg=cfgs[est]||cfgs.ok;
+  const badge=document.getElementById('wa-badge');
+  badge.textContent=cfg.badge;badge.style.background=cfg.bg;badge.style.color=cfg.color;
+  document.getElementById('wa-msg').textContent=generarMsgWA(a,est,hU,restante);
+}
+
+function abrirWhatsApp(){const texto=document.getElementById('wa-msg').textContent;window.open('https://wa.me/?text='+encodeURIComponent(texto),'_blank');}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ─── PIN DE ACCESO ────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+function abrirPIN(){
+  if(jefeLogueado){irA('s-jefatura');renderJefatura();return;}
+  pinIngresado='';
+  actualizarDots();
+  document.getElementById('pin-error').textContent='';
+  document.getElementById('pin-overlay').style.display='flex';
+}
+
+function pinCerrar(){
+  document.getElementById('pin-overlay').style.display='none';
+  pinIngresado='';actualizarDots();
+}
+
+function pinBorrar(){
+  if(pinIngresado.length>0){pinIngresado=pinIngresado.slice(0,-1);actualizarDots();}
+}
+
+function pinKey(k){
+  if(pinIngresado.length>=4)return;
+  pinIngresado+=k;
+  actualizarDots();
+  if(pinIngresado.length===4) setTimeout(verificarPIN,150);
+}
+
+function actualizarDots(){
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('pd'+i);
+    d.classList.remove('filled','error');
+    if(i<pinIngresado.length) d.classList.add('filled');
+  }
+}
+
+function verificarPIN(){
+  if(pinIngresado===PIN_CORRECTO){
+    jefeLogueado=true;
+    document.getElementById('pin-overlay').style.display='none';
+    pinIngresado='';
+    actualizarDots();
+    irA('s-jefatura');
+    renderJefatura();
+  } else {
+    document.getElementById('pin-error').textContent='PIN incorrecto. Intenta de nuevo.';
+    for(let i=0;i<4;i++) document.getElementById('pd'+i).classList.add('error');
+    setTimeout(()=>{
+      pinIngresado='';
+      actualizarDots();
+      document.getElementById('pin-error').textContent='';
+    },800);
+  }
+}
+
+function cerrarSesionJefe(){
+  jefeLogueado=false;
+  irA('s-lista');
+}
+
+// ─── TECLADO FÍSICO PARA PIN ─────────────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('pin-overlay').style.display==='flex'){
+    if(e.key>='0'&&e.key<='9') pinKey(e.key);
+    else if(e.key==='Backspace') pinBorrar();
+    else if(e.key==='Escape') pinCerrar();
+  }
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ─── RENDER JEFATURA ──────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+let filtroUsuarios = 'todos';
+let filtroJefeUsuario = ''; // filtro usuario en tab SLA de jefatura
+
+function switchTab(id){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+    const ids=['tab-resumen','tab-usuarios','tab-historial','tab-nps'];
+    b.classList.toggle('active',ids[i]===id);
+  });
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='tab-usuarios') renderUsuariosTab();
+  if(id==='tab-historial') renderHistorialCompleto();
+  if(id==='tab-nps') renderNPSJefe();
+}
+
+function renderJefatura(){
+  // Poblar botones de filtro rápido por gestor
+  const jefeBtns = document.getElementById('jefe-usuario-btns');
+  if (jefeBtns) {
+    let html = '';
+    USUARIOS.forEach(u => { html += `<button class="filter-btn" id="jf-${u}" onclick="filtrarJefeUsuario('${u}',this)">${u}</button>`; });
+    jefeBtns.innerHTML = html;
+  }
+  renderResumenJefe();
+  renderUsuariosTab();
+  poblarFiltroUsuario();
+}
+
+function filtrarJefeUsuario(u, btn) {
+  filtroJefeUsuario = u;
+  document.querySelectorAll('#tab-resumen .filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderResumenJefe();
+}
+
+function renderResumenJefe(){
+  // Aplicar filtro de gestor si está activo
+  const baseAltas = filtroJefeUsuario ? altas.filter(a=>a.cama===filtroJefeUsuario) : altas;
+  const total=baseAltas.length;
+  const activas=baseAltas.filter(a=>!a.enviada);
+  const enviadas=baseAltas.filter(a=>a.enviada);
+  const vencidas=baseAltas.filter(a=>a.enviada && a.hUsadas>48).length;
+  const cumplidas=baseAltas.filter(a=>a.enviada && a.hUsadas<=48).length;
+
+  let promDemora=0;
+  if(enviadas.length){
+    promDemora=enviadas.reduce((s,a)=>s+(a.hUsadas||0),0)/enviadas.length;
+  }
+
+  const total_nps=npsData.length;
+  let npsScore=0;
+  if(total_nps){
+    const promo=npsData.filter(n=>n.score>=9).length;
+    const detrac=npsData.filter(n=>n.score<=6).length;
+    npsScore=Math.round(((promo-detrac)/total_nps)*100);
+  }
+
+  // Calcular cuentas activas en riesgo/críticas
+  const enRiesgoAhora=activas.filter(a=>{const h=horasHabiles(a.fecha);return estado(h)==='riesgo'||estado(h)==='critica';}).length;
+  const vencidasAhora=activas.filter(a=>estado(horasHabiles(a.fecha))==='vencida').length;
+  const pctSLA=enviadas.length?Math.round((cumplidas/enviadas.length)*100):0;
+  const promH=enviadas.length?Math.round(enviadas.reduce((s,a)=>s+(a.hUsadas||0),0)/enviadas.length*10)/10:0;
+
+  document.getElementById('jefe-metricas').innerHTML=`
+    <div class="jefe-metric"><div class="jefe-metric-label">Activas ahora</div><div class="jefe-metric-val">${activas.length}</div><div class="jefe-metric-sub">${total} en historial total</div></div>
+    <div class="jefe-metric"><div class="jefe-metric-label">En riesgo / críticas</div><div class="jefe-metric-val" style="color:#D4900A">${enRiesgoAhora+vencidasAhora}</div><div class="jefe-metric-sub">${vencidasAhora} ya vencidas</div></div>
+    <div class="jefe-metric"><div class="jefe-metric-label">% cumplimiento SLA</div><div class="jefe-metric-val" style="color:${pctSLA>=80?'var(--green)':pctSLA>=60?'#D4900A':'#C42B2B'}">${enviadas.length?pctSLA+'%':'—'}</div><div class="jefe-metric-sub">${cumplidas} de ${enviadas.length} a tiempo</div></div>
+    <div class="jefe-metric"><div class="jefe-metric-label">Prom. cierre</div><div class="jefe-metric-val" style="color:${promH<=24?'var(--green)':promH<=40?'#D4900A':'#C42B2B'}">${enviadas.length?promH+'h':'—'}</div><div class="jefe-metric-sub">horas hábiles</div></div>
+  `;
+
+  // Alertas activas
+  const alertas=activas.filter(a=>{const h=horasHabiles(a.fecha);return estado(h)!=='ok';});
+  let alertasHtml='';
+  if(!alertas.length){
+    alertasHtml='<div style="font-size:13px;color:var(--green);padding:8px 0">✓ No hay cuentas en alerta en este momento.</div>';
+  } else {
+    alertas.sort((a,b)=>horasHabiles(b.fecha)-horasHabiles(a.fecha)).forEach(a=>{
+      const h=horasHabiles(a.fecha),est=estado(h),restante=Math.max(0,48-h);
+      const cls=est==='vencida'?'tag-red':'tag-amber';
+      const txt=est==='vencida'?'¡VENCIDA!':est==='critica'?'Crítico':' Riesgo';
+      alertasHtml+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-weight:600;font-size:13px">${a.nombre} <span class="mono" style="font-size:11px;color:var(--text3)">${a.episodio}</span></div>
+          <div style="font-size:12px;color:var(--text3)">Usuario: <strong>${a.cama||'N/A'}</strong> · ${a.seguro}</div>
+        </div>
+        <div style="text-align:right">
+          <span class="tag ${cls}">${txt}</span>
+          <div style="font-size:12px;color:var(--text3);margin-top:4px">${est==='vencida'?'SLA superado':formatTime(restante)+' restantes'}</div>
+        </div>
+      </div>`;
+    });
+  }
+  document.getElementById('jefe-alertas').innerHTML=alertasHtml;
+
+  // Demora por usuario
+  let demoraHtml='';
+  const usuariosDemora=[];
+  USUARIOS.forEach(u=>{
+    const cuentasU=altas.filter(a=>a.cama===u&&a.enviada);
+    if(!cuentasU.length)return;
+    const prom=cuentasU.reduce((s,a)=>s+(a.hUsadas||0),0)/cuentasU.length;
+    usuariosDemora.push({u,prom,n:cuentasU.length});
+  });
+  if(!usuariosDemora.length){
+    demoraHtml='<div style="font-size:13px;color:var(--text3)">Sin datos suficientes aún.</div>';
+  } else {
+    const maxProm=Math.max(...usuariosDemora.map(x=>x.prom),1);
+    usuariosDemora.sort((a,b)=>a.prom-b.prom).forEach(({u,prom,n})=>{
+      const pct=Math.min(100,(prom/maxProm)*100);
+      const color=prom<=24?'var(--green)':prom<=40?'#D4900A':'#C42B2B';
+      demoraHtml+=`<div class="demora-bar-wrap">
+        <div class="demora-bar-label">${u}</div>
+        <div class="demora-bar-bg"><div class="demora-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+        <div class="demora-bar-val" style="color:${color}">${Math.round(prom*10)/10}h</div>
+        <div style="font-size:11px;color:var(--text3);min-width:40px;text-align:right">(${n})</div>
+      </div>`;
+    });
+  }
+  document.getElementById('jefe-demora-chart').innerHTML=demoraHtml;
+
+  // Motivos de retraso más frecuentes
+  const conMotivo=altas.filter(a=>a.obs&&a.obs.trim());
+  if(!conMotivo.length){
+    document.getElementById('jefe-motivos').innerHTML='<div style="font-size:13px;color:var(--text3)">Sin motivos de retraso registrados aún.</div>';
+  } else {
+    const recientes=[...conMotivo].reverse().slice(0,6);
+    let motivosHtml='';
+    recientes.forEach(a=>{
+      const h=a.enviada?(a.hUsadas||0):horasHabiles(a.fecha);
+      const est=a.enviada?(h>48?'vencida':'ok'):estado(h);
+      const cls=est==='ok'?'tag-green':est==='vencida'?'tag-red':'tag-amber';
+      motivosHtml+=`<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-size:13px;font-weight:500">${a.nombre} <span class="mono" style="font-size:11px;color:var(--text3)">${a.episodio}</span></div>
+          <div style="font-size:12px;color:var(--amber);margin-top:2px">${a.obs}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">Gestor: <strong>${a.cama||'—'}</strong> · ${fmtFecha(a.fecha)}</div>
+        </div>
+        <span class="tag ${cls}" style="margin-left:10px;flex-shrink:0">${a.enviada?'Cerrada':'Activa'}</span>
+      </div>`;
+    });
+    document.getElementById('jefe-motivos').innerHTML=motivosHtml;
+  }
+}
+
+// ─── TAB USUARIOS ────────────────────────────────────────────────────────────
+function filtrarUsuarios(f,btn){
+  filtroUsuarios=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderUsuariosTab();
+}
+
+function renderUsuariosTab(){
+  let html='';
+  USUARIOS.forEach(u=>{
+    let cuentasU = altas.filter(a => a.cama === u);
+    if(filtroUsuarios==='activas') cuentasU=cuentasU.filter(a=>!a.enviada);
+    if(filtroUsuarios==='enviadas') cuentasU=cuentasU.filter(a=>a.enviada);
+    const activas=altas.filter(a=>a.cama===u&&!a.enviada);
+    const enviadas=altas.filter(a=>a.cama===u&&a.enviada);
+    const vencidas=enviadas.filter(a=>(a.hUsadas||0)>48).length;
+    const npsU=npsData.filter(n=>n.usuario===u);
+    const npsAvg=npsU.length?Math.round(npsU.reduce((s,n)=>s+n.score,0)/npsU.length*10)/10:'—';
+
+    html+=`<div class="card" style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:15px;font-weight:600;color:var(--text)">${u}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">${altas.filter(a=>a.cama===u).length} cuentas totales · ${activas.length} activas · ${enviadas.length} enviadas</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span class="tag tag-gray">NPS prom: ${npsAvg}</span>
+          ${vencidas>0?`<span class="tag tag-red">${vencidas} vencidas</span>`:'<span class="tag tag-green">0 vencidas</span>'}
+        </div>
+      </div>`;
+
+    if(!cuentasU.length){
+      html+=`<div style="font-size:12px;color:var(--text3);padding:8px 0">Sin cuentas en este filtro.</div>`;
+    } else {
+      // Barra de demora promedio
+      const enviU=enviadas;
+      if(enviU.length){
+        const prom=enviU.reduce((s,a)=>s+(a.hUsadas||0),0)/enviU.length;
+        const color=prom<=24?'var(--green)':prom<=40?'#D4900A':'#C42B2B';
+        html+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <div style="font-size:11px;color:var(--text3);min-width:100px">Demora prom.</div>
+          <div style="flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden">
+            <div style="height:100%;width:${Math.min(100,prom/48*100)}%;background:${color};border-radius:4px"></div>
+          </div>
+          <div style="font-size:12px;font-weight:600;color:${color};min-width:40px;font-family:'DM Mono',monospace">${Math.round(prom*10)/10}h</div>
+        </div>`;
+      }
+
+      // Lista de cuentas del usuario
+      cuentasU.slice().reverse().forEach(a=>{
+        const idx=altas.indexOf(a);
+        if(a.enviada){
+          const h=a.hUsadas||0,cumple=h<=48;
+          const tag=cumple?'tag-green':'tag-red';
+          const txt=cumple?`✓ ${Math.round(h*10)/10}h`:`✗ ${Math.round(h*10)/10}h`;
+          html+=`<div class="card card-clickable" style="margin-bottom:6px;padding:12px 14px" onclick="verDetalleCuentaJefe(${idx})">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+              <div>
+                <div style="font-size:13px;font-weight:600">${a.nombre} <span class="mono" style="font-size:11px;color:var(--text3)">${a.episodio}</span></div>
+                <div style="font-size:11px;color:var(--text3)">${a.seguro} · ${fmtFecha(a.fecha)} → ${fmtFecha(a.fechaEnvio)}</div>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center">
+                <span class="tag tag-gray" style="font-size:10px">Enviada</span>
+                <span class="tag ${tag}" style="font-size:10px">${txt}</span>
+              </div>
+            </div>
+          </div>`;
+        } else {
+          const h=horasHabiles(a.fecha),est=estado(h),restante=Math.max(0,48-h);
+          const tagCls=est==='ok'?'tag-green':est==='vencida'?'tag-red':'tag-amber';
+          const tagTxt=est==='ok'?'En tiempo':est==='vencida'?'¡Vencida!':est==='critica'?'Crítico':'Riesgo';
+          html+=`<div class="card card-clickable" style="margin-bottom:6px;padding:12px 14px" onclick="verDetalleCuentaJefe(${idx})">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+              <div>
+                <div style="font-size:13px;font-weight:600">${a.nombre} <span class="mono" style="font-size:11px;color:var(--text3)">${a.episodio}</span></div>
+                <div style="font-size:11px;color:var(--text3)">${a.seguro} · desde ${fmtFecha(a.fecha)}</div>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center">
+                <span class="tag ${tagCls}" style="font-size:10px">${tagTxt}</span>
+                <span style="font-size:11px;color:var(--text2);font-family:'DM Mono',monospace">${est==='vencida'?'SLA superado':formatTime(restante)}</span>
+              </div>
+            </div>
+          </div>`;
+        }
+      });
+    }
+    html+='</div>';
+  });
+  document.getElementById('jefe-usuarios-lista').innerHTML=html||'<div class="empty"><div class="empty-icon">👤</div><div class="empty-title">Sin datos</div></div>';
+}
+
+// ─── HISTORIAL COMPLETO ────────────────────────────────────────────────────────
+function poblarFiltroUsuario(){
+  const sel=document.getElementById('hist-filtro-usuario');
+  sel.innerHTML='<option value="">Todos</option>';
+  USUARIOS.forEach(u=>{sel.innerHTML+=`<option value="${u}">${u}</option>`;});
+}
+
+function limpiarFiltroFecha(){
+  document.getElementById('hist-filtro-desde').value='';
+  document.getElementById('hist-filtro-hasta').value='';
+  renderHistorialCompleto();
+}
+
+function renderHistorialCompleto(){
+  const fu=document.getElementById('hist-filtro-usuario').value;
+  const fe=document.getElementById('hist-filtro-estado').value;
+  const fDesde=document.getElementById('hist-filtro-desde').value;
+  const fHasta=document.getElementById('hist-filtro-hasta').value;
+  let lista=[...altas].reverse();
+  if(fu) lista=lista.filter(a=>a.cama===fu);
+  if(fe==='activa') lista=lista.filter(a=>!a.enviada);
+  if(fe==='enviada') lista=lista.filter(a=>a.enviada);
+  if(fe==='vencida') lista=lista.filter(a=>a.enviada&&(a.hUsadas||0)>48);
+  if(fDesde) lista=lista.filter(a=>a.fecha.slice(0,10)>=fDesde);
+  if(fHasta) lista=lista.filter(a=>a.fecha.slice(0,10)<=fHasta);
+
+  if(!lista.length){
+    document.getElementById('jefe-historial-completo').innerHTML='<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">Sin registros</div><div class="empty-sub">Ajusta los filtros</div></div>';
+    return;
+  }
+
+  let html=`<div class="hist-row hist-head">
+    <div>Paciente / Episodio</div><div>Usuario</div><div>Seguro</div><div>Fecha alta</div><div>Estado SLA</div><div>Detalle</div>
+  </div><div class="hist-body">`;
+
+  lista.forEach(a=>{
+    const idx=altas.indexOf(a);
+    let slaHtml='';
+    if(a.enviada){
+      const h=a.hUsadas||0,cumple=h<=48;
+      slaHtml=`<span class="tag ${cumple?'tag-green':'tag-red'}" style="font-size:10px">${cumple?'✓ '+Math.round(h*10)/10+'h':'✗ '+Math.round(h*10)/10+'h'}</span>`;
+    } else {
+      const h=horasHabiles(a.fecha),est=estado(h);
+      const cls=est==='ok'?'tag-green':est==='vencida'?'tag-red':'tag-amber';
+      const txt=est==='ok'?'En tiempo':est==='vencida'?'Vencida':est==='critica'?'Crítico':'Riesgo';
+      slaHtml=`<span class="tag ${cls}" style="font-size:10px">${txt}</span>`;
+    }
+    html+=`<div class="hist-row">
+      <div><div style="font-weight:600;font-size:12px">${a.nombre}</div><div class="mono" style="font-size:11px;color:var(--text3)">${a.episodio}</div></div>
+      <div class="mono" style="font-size:11px">${a.cama||'—'}</div>
+      <div style="font-size:12px">${a.seguro}</div>
+      <div style="font-size:11px;color:var(--text3)">${fmtFecha(a.fecha)}</div>
+      <div>${slaHtml}</div>
+      <div><button class="btn btn-ghost btn-sm" style="padding:4px 10px;font-size:11px" onclick="verDetalleCuentaJefe(${idx})">Ver →</button></div>
+    </div>`;
+  });
+  html+='</div>';
+  document.getElementById('jefe-historial-completo').innerHTML=html;
+}
+
+// ─── NPS JEFATURA ────────────────────────────────────────────────────────────
+function renderNPSJefe(){
+  const cont=document.getElementById('jefe-nps-detalle');
+  if(!npsData.length){
+    cont.innerHTML='<div class="empty"><div class="empty-icon">⭐</div><div class="empty-title">Sin evaluaciones NPS</div><div class="empty-sub">Se registran al cerrar cada cuenta</div></div>';
+    return;
+  }
+  const total=npsData.length,prom=npsData.reduce((s,n)=>s+n.score,0)/total;
+  const promo=npsData.filter(n=>n.score>=9).length;
+  const pasivo=npsData.filter(n=>n.score>=7&&n.score<=8).length;
+  const detrac=npsData.filter(n=>n.score<=6).length;
+  const ns=Math.round(((promo-detrac)/total)*100);
+  const nsColor=ns>=50?'var(--green)':ns>=0?'#D4900A':'#C42B2B';
+
+  // NPS por usuario
+  let npsUserHtml='';
+  USUARIOS.forEach(u=>{
+    const nU=npsData.filter(n=>n.usuario===u);
+    if(!nU.length)return;
+    const avgU=nU.reduce((s,n)=>s+n.score,0)/nU.length;
+    const proU=nU.filter(n=>n.score>=9).length,detU=nU.filter(n=>n.score<=6).length;
+    const nsU=Math.round(((proU-detU)/nU.length)*100);
+    const cU=nsU>=50?'var(--green)':nsU>=0?'#D4900A':'#C42B2B';
+    npsUserHtml+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)">
+      <div><div class="mono" style="font-size:13px;font-weight:600">${u}</div><div style="font-size:11px;color:var(--text3)">${nU.length} evaluaciones</div></div>
+      <div style="text-align:right">
+        <div style="font-size:16px;font-weight:700;color:${cU}">${nsU}</div>
+        <div style="font-size:11px;color:var(--text3)">NPS · prom ${Math.round(avgU*10)/10}</div>
+      </div>
+    </div>`;
+  });
+
+  cont.innerHTML=`
+    <div class="card">
+      <div class="section-title" style="margin-bottom:14px">Resumen NPS global</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">
+        <div class="score-item"><div class="score-num" style="color:${nsColor}">${ns}</div><div class="score-lbl">NPS Score</div></div>
+        <div class="score-item"><div class="score-num" style="color:var(--green)">${promo}</div><div class="score-lbl">Promotores</div></div>
+        <div class="score-item"><div class="score-num" style="color:var(--amber)">${pasivo}</div><div class="score-lbl">Pasivos</div></div>
+        <div class="score-item"><div class="score-num" style="color:var(--red)">${detrac}</div><div class="score-lbl">Detractores</div></div>
+      </div>
+      <div style="font-size:12px;color:var(--text3)">Promedio: <strong>${Math.round(prom*10)/10}/10</strong> · Total: <strong>${total}</strong> evaluaciones</div>
+    </div>
+    <div class="card">
+      <div class="section-title" style="margin-bottom:12px">NPS por usuario</div>
+      ${npsUserHtml||'<div style="font-size:13px;color:var(--text3)">Sin datos por usuario aún.</div>'}
+    </div>
+    <div class="card">
+      <div class="section-title" style="margin-bottom:12px">Historial completo de evaluaciones</div>
+      ${[...npsData].reverse().map(n=>{
+        const [cat]=NPS_CAT(n.score),cls=n.score>=9?'tag-green':n.score>=7?'tag-amber':'tag-red';
+        return `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:13px;font-weight:500">${n.paciente} <span class="mono" style="font-size:11px;color:var(--text3)">${n.episodio}</span></div>
+            <div style="font-size:11px;color:var(--text3)">Usuario: <strong>${n.usuario||'—'}</strong> · ${fmtFecha(n.fecha)}</div>
+            ${n.comentario?`<div style="font-size:12px;color:var(--text2);margin-top:2px;font-style:italic">"${n.comentario}"</div>`:''}
+          </div>
+          <span class="tag ${cls}" style="margin-left:10px;flex-shrink:0">${n.score}/10</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+// ─── DETALLE CUENTA JEFATURA ─────────────────────────────────────────────────
+function verDetalleCuentaJefe(idx){
+  const a=altas[idx];
+  document.getElementById('jc-titulo').textContent=a.nombre+' · '+a.episodio;
+
+  const h=a.enviada?(a.hUsadas||0):horasHabiles(a.fecha);
+  const est=a.enviada?(h>48?'vencida':'ok'):estado(h);
+  const colorEst=est==='ok'?'var(--green)':est==='vencida'?'#C42B2B':'#D4900A';
+  const tagEst=est==='ok'?'tag-green':est==='vencida'?'tag-red':'tag-amber';
+  const txtEst=a.enviada?(h<=48?'✓ SLA cumplido':'✗ SLA incumplido'):est==='ok'?'En tiempo':est==='vencida'?'Vencida':est==='critica'?'Crítico':'En riesgo';
+
+  // NPS de esta cuenta
+  const npsU=npsData.filter(n=>n.episodio===a.episodio);
+  const npsHtml=npsU.length
+    ? npsU.map(n=>{const cls=n.score>=9?'tag-green':n.score>=7?'tag-amber':'tag-red';return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px">${n.paciente}</div><div style="font-size:11px;color:var(--text3)">${fmtFecha(n.fecha)}${n.comentario?' · "'+n.comentario+'"':''}</div></div><span class="tag ${cls}">${n.score}/10</span></div>`;}).join('')
+    : '<div style="font-size:13px;color:var(--text3);padding:6px 0">Sin evaluación NPS registrada.</div>';
+
+  // Timeline de pasos
+  const pasosHtml=PASOS.map((p,i)=>`<div class="timeline-item">
+    <div class="timeline-dot ${a.pasos[i]?'done':'pending'}"></div>
+    <div class="timeline-title ${a.pasos[i]?'':''}' style="${a.pasos[i]?'color:var(--green)':''}">${p.t}</div>
+    <div class="timeline-sub">${p.s}</div>
+  </div>`).join('');
+
+  document.getElementById('jc-contenido').innerHTML=`
+    <div class="card">
+      <div class="info-grid">
+        <div class="info-item"><div class="info-key">Tipo</div><div class="info-val">${a.tipo==='H'?'<span class="tag tag-blue">Hospitalaria</span>':'<span class="tag tag-purple">Ambulatoria</span>'}</div></div>
+        <div class="info-item"><div class="info-key">Episodio</div><div class="info-val mono" style="font-size:15px;font-weight:600">${a.episodio}</div></div>
+        <div class="info-item"><div class="info-key">Seguro</div><div class="info-val">${a.seguro}</div></div>
+        <div class="info-item"><div class="info-key">Usuario responsable</div><div class="info-val mono">${a.cama||'—'}</div></div>
+        <div class="info-item"><div class="info-key">Fecha de alta</div><div class="info-val">${fmtFecha(a.fecha)} ${fmtHora(a.fecha)}</div></div>
+        <div class="info-item"><div class="info-key">Estado</div><div class="info-val"><span class="tag ${tagEst}">${txtEst}</span></div></div>
+        ${a.enviada?`<div class="info-item"><div class="info-key">Fecha envío</div><div class="info-val">${fmtFecha(a.fechaEnvio)} ${fmtHora(a.fechaEnvio)}</div></div>`:''}
+        <div class="info-item"><div class="info-key">Horas hábiles usadas</div><div class="info-val mono" style="font-weight:600;color:${colorEst}">${Math.round(h*10)/10}h / 48h</div></div>
+      </div>
+      ${a.obs?`<div class="divider"></div><div class="info-item"><div class="info-key">Motivo de retraso</div><div class="info-val" style="color:var(--amber)">${a.obs}</div></div>`:''}
+    </div>
+
+    <div class="card">
+      <div class="section-title" style="margin-bottom:14px">Progreso de pasos (${a.pasos.filter(Boolean).length}/${PASOS.length})</div>
+      <div class="pbar" style="margin-bottom:16px;height:8px"><div class="pbar-fill" style="width:${a.pasos.filter(Boolean).length/PASOS.length*100}%;background:${colorEst}"></div></div>
+      <div class="cuenta-timeline">${pasosHtml}</div>
+    </div>
+
+    <div class="card">
+      <div class="section-title" style="margin-bottom:12px">NPS de este paciente</div>
+      ${npsHtml}
+    </div>
+  `;
+
+  irA('s-jefe-cuenta');
+}
+
+// ─── ENCUESTA NPS DEL PACIENTE (mini-web) ────────────────────────────────────
+let encNpsSel = null;
+let encEpisodioActual = null;
+
+async function initEncuestaPaciente(episodio) {
+  const fab = document.getElementById('jefe-fab');
+  if (fab) fab.closest('.jefe-nav').style.display = 'none';
+
+  irA('s-encuesta-paciente');
+
+  // Mostrar spinner mientras carga
+  document.getElementById('enc-form').style.display = 'none';
+  document.getElementById('enc-info-box').style.display = 'none';
+  document.getElementById('enc-error-box').style.display = 'none';
+  document.getElementById('enc-resultado').style.display = 'none';
+  document.getElementById('enc-resultado').innerHTML = `
+    <div style="text-align:center;padding:60px 20px;color:#6B6760">
+      <div style="font-size:32px;margin-bottom:12px">⏳</div>
+      <div style="font-size:15px;font-weight:500">Cargando encuesta...</div>
+    </div>`;
+  document.getElementById('enc-resultado').style.display = 'block';
+
+  // Cargar datos compartidos frescos (del dispositivo del gestor)
+  await cargarDatos();
+
+  const alta = altas.find(a => a.episodio === episodio);
+
+  document.getElementById('enc-resultado').style.display = 'none';
+
+  if (!alta) {
+    document.getElementById('enc-error-box').style.display = 'block';
+    return;
+  }
+
+  // Verificar si ya fue respondida
+  const yaRespondida = npsData.some(n => n.episodio === episodio && n.viaLink);
+  if (yaRespondida) {
+    document.getElementById('enc-resultado').style.display = 'block';
+    document.getElementById('enc-resultado').innerHTML = `
+      <div class="enc-resultado">
+        <div class="enc-resultado-icon" style="background:#E6F4ED;border:2px solid #A8D5BC;font-size:28px">✓</div>
+        <div style="font-size:18px;font-weight:600;color:#1A6B4A;margin-bottom:8px">¡Encuesta ya registrada!</div>
+        <div style="font-size:14px;color:#6B6760">Su calificación fue registrada anteriormente. ¡Muchas gracias!</div>
+      </div>`;
+    return;
+  }
+
+  encEpisodioActual = episodio;
+  document.getElementById('enc-info-box').style.display = 'flex';
+  document.getElementById('enc-form').style.display = 'block';
+  document.getElementById('enc-episodio').textContent = alta.episodio;
+  document.getElementById('enc-paciente').textContent = alta.nombre;
+
+  let html = '';
+  for (let i = 0; i <= 10; i++) {
+    const cls = i <= 6 ? 'det' : i <= 8 ? 'neu' : 'pro';
+    html += `<button class="enc-num ${cls}" id="enc-n-${i}" onclick="selEncNum(${i})">${i}</button>`;
+  }
+  document.getElementById('enc-scale').innerHTML = html;
+  encNpsSel = null;
+}
+
+function selEncNum(v) {
+  encNpsSel = v;
+  for (let i = 0; i <= 10; i++) {
+    const btn = document.getElementById('enc-n-' + i);
+    if (!btn) continue;
+    const base = i <= 6 ? 'det' : i <= 8 ? 'neu' : 'pro';
+    btn.className = 'enc-num ' + base;
+  }
+  const selBtn = document.getElementById('enc-n-' + v);
+  const selCls = v <= 6 ? 'sel-det' : v <= 8 ? 'sel-neu' : 'sel-pro';
+  selBtn.className = 'enc-num ' + (v <= 6 ? 'det' : v <= 8 ? 'neu' : 'pro') + ' ' + selCls;
+
+  const cats = v >= 9 ? ['🌟 Promotor · ¡Gracias por su confianza!', '#1A6B4A']
+                      : v >= 7 ? ['👍 Satisfecho · Gracias por su respuesta', '#8A5A00']
+                               : ['📝 Detractor · Lamentamos su experiencia', '#8B1A1A'];
+  const prev = document.getElementById('enc-cat-preview');
+  prev.textContent = cats[0];
+  prev.style.color = cats[1];
+
+  const btn = document.getElementById('enc-submit-btn');
+  btn.disabled = false;
+  btn.style.opacity = '1';
+  btn.style.pointerEvents = 'auto';
+}
+
+async function enviarEncuestaPaciente() {
+  if (encNpsSel === null || !encEpisodioActual) return;
+
+  const btn = document.getElementById('enc-submit-btn');
+  btn.textContent = 'Registrando...';
+  btn.disabled = true;
+  btn.style.opacity = '0.7';
+
+  // Recargar datos frescos antes de guardar para no pisar cambios de otros
+  await cargarDatos();
+
+  const alta = altas.find(a => a.episodio === encEpisodioActual);
+  if (!alta) { btn.textContent = 'Error. Intenta de nuevo.'; return; }
+
+  // Verificar de nuevo por si alguien ya respondió mientras tanto
+  if (npsData.some(n => n.episodio === encEpisodioActual && n.viaLink)) {
+    document.getElementById('enc-form').style.display = 'none';
+    document.getElementById('enc-resultado').style.display = 'block';
+    document.getElementById('enc-resultado').innerHTML = `<div class="enc-resultado"><div style="font-size:18px;font-weight:600;color:#1A6B4A">¡Ya fue registrada anteriormente!</div></div>`;
+    return;
+  }
+
+  // Agregar la respuesta y guardar en almacenamiento compartido
+  npsData.push({
+    paciente: alta.nombre,
+    episodio: alta.episodio,
+    usuario: alta.cama || '—',
+    score: encNpsSel,
+    comentario: '',
+    fecha: new Date().toISOString(),
+    viaLink: true
+  });
+  await guardar();
+
+  // Mostrar resultado al paciente
+  document.getElementById('enc-form').style.display = 'none';
+  document.getElementById('enc-resultado').style.display = 'block';
+
+  const score = encNpsSel;
+  const isPromo = score >= 9, isPasi = score >= 7;
+  const color   = isPromo ? '#1A6B4A' : isPasi ? '#8A5A00' : '#8B1A1A';
+  const bgColor = isPromo ? '#E6F4ED' : isPasi ? '#FFF3D6' : '#FDEAEA';
+  const bdColor = isPromo ? '#A8D5BC' : isPasi ? '#F0CC7A' : '#F0AAAA';
+  const cat     = isPromo ? 'Promotor' : isPasi ? 'Satisfecho' : 'Detractor';
+  const emoji   = isPromo ? '🌟' : isPasi ? '👍' : '📝';
+  const msg     = isPromo
+    ? '¡Muchas gracias por su confianza! Es un placer haberle atendido en Clínica San Felipe.'
+    : isPasi
+    ? 'Gracias por su respuesta. Seguiremos trabajando para mejorar su experiencia.'
+    : 'Gracias por compartir su experiencia. Lamentamos no haber cumplido sus expectativas. Trabajaremos para mejorar.';
+
+  document.getElementById('enc-resultado').innerHTML = `
+    <div class="enc-resultado">
+      <div class="enc-resultado-icon" style="background:${bgColor};border:2px solid ${bdColor}">${emoji}</div>
+      <div class="enc-resultado-score" style="color:${color}">${score}</div>
+      <div style="font-size:13px;color:#A8A49E;margin-bottom:6px">de 10 puntos</div>
+      <div class="enc-resultado-cat" style="color:${color}">${cat}</div>
+      <div class="enc-resultado-msg">${msg}</div>
+      <div style="margin-top:24px;padding-top:20px;border-top:1px solid #E2DDD5;font-size:12px;color:#A8A49E">
+        Su calificación ha sido registrada. Puede cerrar esta ventana.
+      </div>
+    </div>`;
+}
+
+// ─── DETECTOR DE URL PARA ENCUESTA PACIENTE ─────────────────────────────────
+async function checkUrlEncuesta() {
+  const params = new URLSearchParams(window.location.search);
+  const nps = params.get('nps');
+  if (nps) {
+    await initEncuestaPaciente(decodeURIComponent(nps));
+    return true;
+  }
+  return false;
+}
+
+// ─── CARGA INICIAL ────────────────────────────────────────────────────────────
+function mostrarCargando(msg) {
+  let el = document.getElementById('_carga-overlay');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = '_carga-overlay';
+    el.style.cssText = 'position:fixed;inset:0;background:rgba(245,243,238,.92);backdrop-filter:blur(4px);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px';
+    el.innerHTML = `<svg width="40" height="40" viewBox="0 0 44 44" fill="none"><rect width="44" height="44" rx="10" fill="#003A70"/><rect x="18" y="9" width="8" height="26" rx="2" fill="white"/><rect x="9" y="18" width="26" height="8" rx="2" fill="white"/><rect x="18" y="9" width="8" height="4" rx="2" fill="#00A651"/><rect x="9" y="18" width="4" height="8" rx="2" fill="#00A651"/></svg>
+    <div style="font-size:14px;color:#6B6760;font-family:'DM Sans',sans-serif" id="_carga-msg">${msg||'Cargando...'}</div>`;
+    document.body.appendChild(el);
+  } else {
+    document.getElementById('_carga-msg').textContent = msg || 'Cargando...';
+    el.style.display = 'flex';
+  }
+}
+
+function ocultarCargando() {
+  const el = document.getElementById('_carga-overlay');
+  if (el) el.style.display = 'none';
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+(async () => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('nps')) {
+    await checkUrlEncuesta();
+  } else {
+    await initLogin();
+  }
+})();
+</script>
+</body>
+</html>
